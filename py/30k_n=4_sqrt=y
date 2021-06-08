@@ -1,0 +1,482 @@
+                    input | frequency 
+--------------------------------------------------
+                      you | 28787591  
+                        i | 27086011  
+                      the | 22761659  
+                       to | 17099834  
+                        a | 14484562  
+                       's | 14291013  
+                       it | 13631703  
+                      and | 10572938  
+                     that | 10203742  
+                       't | 9628970   
+
+10%
+20%
+30%
+40%
+50%
+60%
+70%
+80%
+89%
+
+desired prefix: ('i', 'o', 'u', 's')
+prob(i)=3.61571%
+prob(o)=4.421%
+prob(u)=1.704%
+prob(s)=2.558%
+-------------------------
+final prob: 0.00007%
+expected  : 2411.09
+deviation : 49.10
+found     : 515328
+std_deviations from mean : 10445.77642
+prob of finding that many, or more: 0.00000%
+
+desired prefix: ('i', 'o', 'u', 's')
+prob(i)=3.61571%
+prob(o|i)=2.547%
+prob(u|o)=22.075%
+prob(s|u)=11.717%
+-------------------------
+final prob: 0.00238%
+expected  : 82438.86
+deviation : 287.12
+found     : 515328
+std_deviations from mean : 1507.70332
+prob of finding that many, or more: 0.00000%
+
+desired prefix: ('i', 'o', 'u', 's')
+prob(i)=3.61571%
+prob(o|i)=2.547%
+prob(u|i,o)=10.855%
+prob(s|o,u)=2.942%
+-------------------------
+final prob: 0.00029%
+expected  : 10177.92
+deviation : 100.89
+found     : 515328
+std_deviations from mean : 5007.15966
+prob of finding that many, or more: 0.00000%
+
+desired prefix: ('i', 'o', 'u', 's')
+prob(i)=3.61571%
+prob(o|i)=2.547%
+prob(u|i,o)=10.855%
+prob(s|i,o,u)=98.147%
+-------------------------
+final prob: 0.00981%
+expected  : 339556.88
+deviation : 582.69
+found     : 515328
+std_deviations from mean : 301.65640
+prob of finding that many, or more: 0.00000%
+  prefix   | st.dev  | entr  | std*ent  |            examples           
+--------------------------------------------------------------------------------
+   k,i,n,g |    1690 | 6.611 |  1049386 | talking,looking,fucking,thinki
+   j,u,s,t |    1891 | 2.702 |   822659 | just,justice,justin,just-,adju
+   i,g,h,t |    1387 | 6.556 |   722203 | right,night,might,tonight,figh
+   h,i,n,g |    1360 | 5.647 |   701351 | something,thing,anything,nothi
+   k,n,o,w |    3412 | 2.788 |   568470 | know,knows,known,knowing,knowl
+   b,a,c,k |    1576 | 3.959 |   528777 | back,background,backup,backwar
+   e,v,e,r |    2895 | 4.902 |   477647 | never,everything,ever,every,ev
+   t,h,e,r |     592 | 5.760 |   468000 | there,other,father,mother,anot
+   o,u,l,d |    1906 | 3.062 |   432664 | would,could,should,wouldn,coul
+   a,l,l,y |    1886 | 6.110 |   424044 | really,actually,finally,totall
+   v,e,r,y |    3831 | 3.207 |   414536 | very,everything,every,everyone
+   t,i,n,g |    1569 | 8.163 |   412162 | getting,waiting,meeting,intere
+   h,e,r,e |    3200 | 3.949 |   379173 | there,here,where,somewhere,any
+   t,h,i,n |    2381 | 4.128 |   364973 | think,something,thing,anything
+   r,i,g,h |    1117 | 3.842 |   305500 | right,alright,bright,rights,fr
+   t,i,o,n |    1259 | 9.139 |   304371 | question,questions,information
+   l,i,n,g |     861 | 7.416 |   293865 | telling,feeling,calling,darlin
+   o,u,g,h |     884 | 4.634 |   292471 | thought,through,enough,though,
+   v,i,n,g |     830 | 5.259 |   291240 | having,living,leaving,giving,m
+   y,o,u,r |    1444 | 1.790 |   289665 | your,yourself,yours,yourselves
+   d,i,n,g |    1240 | 6.975 |   286933 | wedding,kidding,building,stand
+   r,i,n,g |     928 | 7.373 |   286387 | bring,during,ring,wearing,ring
+   l,i,k,e |     813 | 2.501 |   277570 | like,liked,likes,likely,unlike
+   o,v,e,r |    1064 | 6.511 |   272192 | over,government,cover,discover
+   y,i,n,g |    1541 | 5.414 |   264375 | trying,saying,playing,lying,cr
+   f,u,c,k |    1001 | 3.039 |   264143 | fuck,fucking,fuckin,fucked,mot
+   h,a,v,e |     976 | 1.736 |   251375 | have,haven,behave,shave,shaved
+   n,i,n,g |    1487 | 6.692 |   247087 | morning,running,evening,happen
+   o,u,n,d |    1286 | 5.452 |   239077 | around,found,sounds,sound,roun
+   w,h,a,t |    2435 | 1.892 |   234913 | what,whatever,somewhat,whatsoe
+   s,o,m,e |    2179 | 3.831 |   233252 | some,something,someone,somebod
+   w,o,r,k |    2962 | 4.346 |   231791 | work,working,worked,works,work
+   w,e,l,l |    1593 | 3.464 |   224006 | well,farewell,swell,wells,powe
+   c,o,m,p |    1011 | 6.509 |   223590 | company,completely,computer,co
+   c,o,m,e |     520 | 3.177 |   220855 | come,comes,welcome,become,beco
+   w,i,l,l |    1212 | 3.011 |   209632 | will,willing,william,williams,
+   e,x,p,e |     362 | 4.733 |   202623 | expect,experience,expecting,ex
+   q,u,e,s |     171 | 3.698 |   202017 | question,questions,request,que
+   a,p,p,e |     509 | 5.046 |   198074 | happened,happen,happens,happen
+   c,a,l,l |     580 | 5.204 |   195867 | call,called,calling,calls,basi
+   l,o,o,k |    2350 | 2.888 |   194657 | look,looking,looks,looked,look
+   e,x,p,l |     288 | 4.585 |   187140 | explain,explosion,explanation,
+   n,d,e,r |    2225 | 6.570 |   179087 | understand,under,wonderful,won
+   w,i,t,h |    4748 | 2.261 |   176455 | with,without,within,withdraw,w
+   h,a,p,p |     908 | 3.207 |   169645 | happened,happy,happen,happens,
+   u,g,h,t |      29 | 4.295 |   168090 | thought,daughter,brought,caugh
+   g,o,o,d |    2779 | 2.917 |   166715 | good,goodbye,good-bye,goodness
+   m,i,n,g |      31 | 5.831 |   158631 | coming,screaming,becoming,char
+   h,i,n,k |    3455 | 1.987 |   155660 | think,thinking,thinks,thinkin,
+   i,n,g,s |     432 | 6.036 |   155042 | things,rings,feelings,brings,w
+   c,k,i,n |     384 | 5.634 |   152318 | fucking,fuckin,knocking,pickin
+   j,a,c,k |     434 | 4.145 |   152142 | jack,jacket,jackson,jackie,jac
+   m,e,n,t |    1664 | 7.527 |   150332 | moment,government,apartment,de
+   s,i,n,g |     600 | 6.548 |   148616 | missing,sing,using,single,sing
+   p,i,n,g |     400 | 6.382 |   142194 | sleeping,helping,keeping,hopin
+   t,a,k,e |     893 | 3.630 |   136602 | take,taken,takes,mistake,mista
+   m,b,e,r |    3506 | 4.732 |   136204 | remember,number,numbers,member
+   t,i,m,e |    2260 | 4.507 |   136133 | time,times,sometimes,sometime,
+   f,f,i,c |    1928 | 4.058 |   133047 | office,officer,difficult,offic
+   u,n,d,e |    2207 | 5.545 |   131453 | understand,under,understood,un
+   g,i,v,e |     630 | 2.465 |   130771 | give,given,forgive,gives,forgi
+   d,o,w,n |    3284 | 3.874 |   130485 | down,downstairs,downtown,break
+   k,i,l,l |     959 | 3.286 |   129411 | kill,killed,killing,killer,ski
+   m,a,k,e |     586 | 2.737 |   126849 | make,makes,makeup,maker,make-u
+   s,u,p,p |    1998 | 4.091 |   123461 | supposed,suppose,support,suppl
+   t,h,a,t |    3156 | 1.150 |   123427 | that,that-,thats,that-that,'th
+   e,v,e,n |    1858 | 4.079 |   123360 | even,evening,seven,revenge,eve
+   l,o,v,e |     544 | 3.219 |   123234 | love,loved,lovely,loves,lover,
+   b,o,d,y |    1891 | 2.613 |   120600 | everybody,somebody,body,nobody
+   c,k,e,d |    1082 | 5.290 |   116090 | picked,locked,checked,fucked,a
+   h,a,n,k |    3576 | 2.733 |   114825 | thank,thanks,hank,thanksgiving
+   o,i,n,g |    1555 | 2.156 |   114416 | going,doing,echoing,ongoing,bo
+   a,b,l,e |     488 | 6.972 |   113631 | able,table,comfortable,availab
+   s,e,l,f |    3624 | 4.092 |   112862 | yourself,myself,himself,hersel
+   s,p,e,c |    1711 | 5.642 |   109066 | special,respect,especially,sus
+   a,t,i,o |    1715 | 8.291 |   107881 | information,station,situation,
+   q,u,i,t |     112 | 2.834 |   106833 | quite,quit,quitting,mosquito,m
+   l,i,v,e |     365 | 4.103 |   105329 | live,alive,lives,lived,deliver
+   p,l,a,y |    1098 | 4.012 |   104915 | play,playing,played,plays,play
+   c,o,m,m |     662 | 6.079 |   104578 | common,commander,command,commu
+   p,l,a,c |     953 | 3.754 |   104156 | place,places,someplace,placed,
+   a,n,c,e |     466 | 6.777 |   103904 | chance,dance,france,distance,c
+   n,i,g,h |     807 | 3.864 |    97833 | night,tonight,nights,midnight,
+   t,a,l,k |    3391 | 2.701 |    93979 | talk,talking,talked,talks,talk
+   p,r,e,s |    1736 | 6.117 |    93879 | president,present,press,pressu
+   r,e,a,l |    2125 | 3.585 |    93837 | really,real,realize,realized,r
+   o,u,r,s |     874 | 3.595 |    93741 | course,yourself,hours,yours,ou
+   c,a,u,s |    1049 | 2.402 |    93520 | because,cause,'cause,caused,ca
+   w,h,e,r |    1344 | 2.763 |    92264 | where,somewhere,anywhere,every
+   w,a,n,t |    4880 | 1.897 |    91315 | want,wanted,wants,wanting,unwa
+   l,o,n,g |    3576 | 3.677 |    90898 | long,along,longer,belong,belon
+   p,a,r,t |    1609 | 5.072 |    90445 | part,party,apartment,partner,d
+   s,i,d,e |    1950 | 5.269 |    90045 | inside,side,outside,president,
+   s,u,r,e |    2513 | 4.251 |    90009 | sure,pleasure,pressure,surely,
+   f,f,e,r |    1332 | 4.117 |    89611 | different,offer,difference,off
+   o,t,h,e |    1007 | 4.610 |    89236 | other,mother,another,brother,o
+   p,p,e,n |    1138 | 2.413 |    88540 | happened,happen,happens,happen
+   a,u,g,h |     405 | 4.203 |    88094 | daughter,laughs,laughing,caugh
+   a,n,g,e |    3546 | 5.453 |    86562 | change,changed,strange,dangero
+   g,i,n,g |     220 | 5.891 |    86409 | singing,ringing,hanging,bringi
+  prefix   | st.dev  | entr  | std*ent  |            examples           
+--------------------------------------------------------------------------------
+   i,g,h,t |    1387 | 6.556 |   213460 | right,night,might,tonight,figh
+   t,i,o,n |    1259 | 9.139 |   168287 | question,questions,information
+   k,n,o,w |    3412 | 2.788 |    90182 | know,knows,known,knowing,knowl
+   l,o,o,k |    2350 | 2.888 |    84418 | look,looking,looks,looked,look
+   j,o,h,n |    1537 | 2.241 |    77624 | john,johnny,johnson,johnnie,jo
+   t,t,l,e |     914 | 3.990 |    76485 | little,battle,bottle,settle,se
+   g,o,o,d |    2779 | 2.917 |    73348 | good,goodbye,good-bye,goodness
+   a,t,i,o |    1715 | 8.291 |    67931 | information,station,situation,
+   w,o,r,k |    2962 | 4.346 |    65610 | work,working,worked,works,work
+   g,i,r,l |    2621 | 2.527 |    61671 | girl,girls,girlfriend,girlfrie
+   r,i,g,h |    1117 | 3.842 |    56496 | right,alright,bright,rights,fr
+   u,g,h,t |      29 | 4.295 |    53796 | thought,daughter,brought,caugh
+   s,e,l,f |    3624 | 4.092 |    53278 | yourself,myself,himself,hersel
+   b,a,c,k |    1576 | 3.959 |    52901 | back,background,backup,backwar
+   i,o,n,s |    1619 | 7.514 |    50064 | questions,relationship,congrat
+   k,i,n,g |    1690 | 6.611 |    50063 | talking,looking,fucking,thinki
+   c,t,i,o |     608 | 6.648 |    47944 | action,connection,direction,pr
+   t,t,e,r |    1564 | 6.060 |    47751 | better,matter,letter,matters,l
+   k,e,e,p |    2794 | 2.899 |    43739 | keep,keeping,keeps,keeper,hous
+   b,o,d,y |    1891 | 2.613 |    42302 | everybody,somebody,body,nobody
+   y,i,n,g |    1541 | 5.414 |    41266 | trying,saying,playing,lying,cr
+   s,p,e,c |    1711 | 5.642 |    41119 | special,respect,especially,sus
+   s,i,g,n |    2253 | 4.980 |    40420 | sign,signed,signal,signs,desig
+   a,f,t,e |     790 | 2.591 |    40208 | after,afternoon,afterwards,aft
+   l,i,k,e |     813 | 2.501 |    40010 | like,liked,likes,likely,unlike
+   d,o,w,n |    3284 | 3.874 |    38605 | down,downstairs,downtown,break
+   j,u,s,t |    1891 | 2.702 |    38537 | just,justice,justin,just-,adju
+   c,i,a,l |     649 | 4.864 |    37855 | special,especially,social,offi
+   s,o,m,e |    2179 | 3.831 |    37578 | some,something,someone,somebod
+   p,o,r,t |    2874 | 5.755 |    37111 | important,report,support,oppor
+   t,a,l,k |    3391 | 2.701 |    36910 | talk,talking,talked,talks,talk
+   s,i,o,n |     644 | 6.876 |    36364 | decision,mission,permission,pr
+   c,t,u,a |     953 | 2.346 |    35456 | actually,actual,intellectual,s
+   p,a,r,t |    1609 | 5.072 |    35453 | part,party,apartment,partner,d
+   p,r,o,b |    1288 | 2.889 |    35121 | problem,probably,problems,prob
+   e,t,t,e |     754 | 4.369 |    34781 | better,letter,letters,cigarett
+   s,i,d,e |    1950 | 5.269 |    34264 | inside,side,outside,president,
+   d,a,m,n |    2318 | 2.213 |    33705 | damn,goddamn,damned,goddamned,
+   t,u,r,n |    2252 | 3.659 |    33500 | turn,return,turned,turns,turni
+   t,a,k,e |     893 | 3.630 |    33060 | take,taken,takes,mistake,mista
+   n,u,m,b |    1115 | 2.044 |    32665 | number,numbers,numb,outnumbere
+   a,l,l,y |    1886 | 6.110 |    32518 | really,actually,finally,totall
+   c,o,m,p |    1011 | 6.509 |    32510 | company,completely,computer,co
+   f,r,i,e |    2207 | 3.603 |    32411 | friend,friends,girlfriend,boyf
+   o,u,l,d |    1906 | 3.062 |    31824 | would,could,should,wouldn,coul
+   t,u,a,l |     560 | 3.545 |    31623 | actually,eventually,actual,spi
+   h,i,n,g |    1360 | 5.647 |    31582 | something,thing,anything,nothi
+   t,i,n,g |    1569 | 8.163 |    31365 | getting,waiting,meeting,intere
+   n,i,g,h |     807 | 3.864 |    30841 | night,tonight,nights,midnight,
+   g,u,e,s |     633 | 3.284 |    30568 | guess,guest,guests,guessing,co
+   m,e,n,t |    1664 | 7.527 |    30213 | moment,government,apartment,de
+   t,i,m,e |    2260 | 4.507 |    30191 | time,times,sometimes,sometime,
+   q,u,e,s |     171 | 3.698 |    30097 | question,questions,request,que
+   s,s,i,o |    1084 | 5.737 |    29535 | mission,permission,professiona
+   a,p,p,e |     509 | 5.046 |    29206 | happened,happen,happens,happen
+   w,e,e,k |    2031 | 2.109 |    28888 | week,weeks,weekend,weekends,we
+   a,u,g,h |     405 | 4.203 |    28878 | daughter,laughs,laughing,caugh
+   c,e,p,t |    1167 | 4.532 |    28232 | except,accept,accepted,recepti
+   e,v,e,r |    2895 | 4.902 |    27367 | never,everything,ever,every,ev
+   n,e,e,d |    3373 | 2.448 |    27197 | need,needs,needed,needle,needi
+   e,n,t,s |     606 | 6.219 |    27092 | parents,students,patients,mome
+   w,i,l,l |    1212 | 3.011 |    26974 | will,willing,william,williams,
+   d,o,e,s |     860 | 1.358 |    26889 | does,doesn,torpedoes,doesnt,do
+   s,i,b,l |     481 | 3.648 |    26870 | possible,impossible,responsibl
+   w,e,l,l |    1593 | 3.464 |    26605 | well,farewell,swell,wells,powe
+   f,u,c,k |    1001 | 3.039 |    26465 | fuck,fucking,fuckin,fucked,mot
+   e,c,i,a |     692 | 3.584 |    26311 | special,especially,appreciate,
+   s,s,i,b |    1139 | 2.799 |    26157 | possible,impossible,possibly,p
+   r,i,e,n |    1202 | 4.020 |    25942 | friend,friends,girlfriend,boyf
+   e,c,t,i |     439 | 6.171 |    25814 | detective,expecting,connection
+   v,e,r,y |    3831 | 3.207 |    25685 | very,everything,every,everyone
+   p,e,o,p |     817 | 0.638 |    25675 | people,peoples,people-,townspe
+   f,o,r,m |     552 | 5.496 |    25358 | information,form,performance,f
+   n,i,n,g |    1487 | 6.692 |    25311 | morning,running,evening,happen
+   a,t,c,h |     300 | 5.106 |    25253 | watch,catch,watching,match,wat
+   n,e,s,s |    1463 | 5.961 |    24765 | business,witness,happiness,goo
+   p,e,c,t |     575 | 5.231 |    24504 | expect,respect,suspect,inspect
+   i,b,l,e |     557 | 4.718 |    24481 | possible,terrible,impossible,r
+   c,l,o,s |    1424 | 3.588 |    24177 | close,closed,closer,closes,clo
+   e,n,c,e |     644 | 6.393 |    24095 | evidence,difference,experience
+   c,r,a,z |    1581 | 1.692 |    24028 | crazy,craziest,crazier,crazine
+   y,e,a,h |    4622 | 0.597 |    23668 | yeah,yeah.,y-yeah,yeah-,'yeah
+   s,h,i,p |    2773 | 5.299 |    23308 | ship,relationship,friendship,s
+   o,u,g,h |     884 | 4.634 |    23119 | thought,through,enough,though,
+   c,o,m,m |     662 | 6.079 |    22773 | common,commander,command,commu
+   p,l,a,c |     953 | 3.754 |    22657 | place,places,someplace,placed,
+   m,i,s,s |    3298 | 4.615 |    22364 | miss,missing,missed,mission,pe
+   h,e,r,e |    3200 | 3.949 |    22131 | there,here,where,somewhere,any
+   l,a,u,g |     975 | 3.126 |    22107 | laughs,laughing,laugh,laughter
+   f,e,e,l |    2908 | 1.999 |    22052 | feel,feeling,feels,feelings,fe
+   f,o,r,g |     643 | 3.725 |    21942 | forget,forgive,forgot,forgotte
+   l,i,e,v |    1602 | 2.900 |    21763 | believe,believed,unbelievable,
+   c,a,u,s |    1049 | 2.402 |    21722 | because,cause,'cause,caused,ca
+   a,b,l,e |     488 | 6.972 |    21526 | able,table,comfortable,availab
+   h,a,p,p |     908 | 3.207 |    21476 | happened,happy,happen,happens,
+   f,e,c,t |     886 | 4.646 |    21393 | perfect,perfectly,effect,effec
+   s,t,r,a |     451 | 6.247 |    21374 | straight,strange,stranger,stra
+   w,h,a,t |    2435 | 1.892 |    21326 | what,whatever,somewhat,whatsoe
+   a,u,s,e |    2198 | 2.874 |    21322 | because,cause,'cause,applause,
+   t,r,a,i |     660 | 4.907 |    21242 | straight,train,training,traine
+  prefix   | st.dev  | entr  | std*ent  |            examples           
+--------------------------------------------------------------------------------
+   i,o,u,s |    5007 | 5.770 |    28891 | serious,seriously,obviously,ob
+   s,e,r,v |    4078 | 5.070 |    20679 | service,deserve,serve,served,s
+   a,n,g,e |    3546 | 5.453 |    19335 | change,changed,strange,dangero
+   m,b,e,r |    3506 | 4.732 |    16589 | remember,number,numbers,member
+   p,o,r,t |    2874 | 5.755 |    16545 | important,report,support,oppor
+   c,t,o,r |    3062 | 5.293 |    16211 | doctor,director,inspector,doct
+   m,i,s,s |    3298 | 4.615 |    15222 | miss,missing,missed,mission,pe
+   s,e,l,f |    3624 | 4.092 |    14832 | yourself,myself,himself,hersel
+   s,h,i,p |    2773 | 5.299 |    14695 | ship,relationship,friendship,s
+   v,i,s,i |    3270 | 4.486 |    14672 | visit,television,vision,divisi
+   d,i,s,c |    2713 | 5.405 |    14667 | discuss,discovered,discover,di
+   n,d,e,r |    2225 | 6.570 |    14622 | understand,under,wonderful,won
+   a,t,i,o |    1715 | 8.291 |    14223 | information,station,situation,
+   e,v,e,r |    2895 | 4.902 |    14191 | never,everything,ever,every,ev
+   l,o,n,g |    3576 | 3.677 |    13148 | long,along,longer,belong,belon
+   w,o,r,k |    2962 | 4.346 |    12876 | work,working,worked,works,work
+   t,i,n,g |    1569 | 8.163 |    12808 | getting,waiting,meeting,intere
+   d,o,w,n |    3284 | 3.874 |    12722 | down,downstairs,downtown,break
+   s,l,e,e |    3873 | 3.273 |    12677 | sleep,sleeping,asleep,sleepy,s
+   h,e,r,e |    3200 | 3.949 |    12638 | there,here,where,somewhere,any
+   c,h,e,c |    3529 | 3.556 |    12551 | check,checked,checking,checks,
+   m,e,n,t |    1664 | 7.527 |    12527 | moment,government,apartment,de
+   v,e,r,y |    3831 | 3.207 |    12289 | very,everything,every,everyone
+   u,n,d,e |    2207 | 5.545 |    12240 | understand,under,understood,un
+   i,o,n,s |    1619 | 7.514 |    12167 | questions,relationship,congrat
+   r,o,o,m |    2874 | 4.224 |    12139 | room,bathroom,bedroom,rooms,gr
+   m,e,a,n |    4133 | 2.835 |    11720 | mean,means,meant,meaning,meant
+   n,i,s,h |    2477 | 4.697 |    11636 | finish,finished,spanish,punish
+   e,a,s,e |    2789 | 4.164 |    11617 | please,release,pleased,disease
+   l,a,t,e |    2156 | 5.366 |    11572 | later,late,lately,plate,chocol
+   a,l,l,y |    1886 | 6.110 |    11523 | really,actually,finally,totall
+   t,i,o,n |    1259 | 9.139 |    11514 | question,questions,information
+   c,o,n,t |    1890 | 5.981 |    11306 | control,contact,continue,conti
+   s,i,g,n |    2253 | 4.980 |    11224 | sign,signed,signal,signs,desig
+   k,i,n,g |    1690 | 6.611 |    11172 | talking,looking,fucking,thinki
+   a,t,o,r |    1801 | 6.169 |    11115 | narrator,elevator,senator,oper
+   l,i,s,t |    2292 | 4.824 |    11058 | listen,list,listening,listened
+   c,h,e,d |    1999 | 5.485 |    10965 | reached,watched,touched,schedu
+   l,l,e,d |    2527 | 4.325 |    10932 | called,killed,pulled,filled,co
+   r,o,u,n |    2931 | 3.726 |    10924 | around,round,ground,background
+   d,e,r,s |    1969 | 5.461 |    10753 | understand,orders,understood,u
+   w,i,t,h |    4748 | 2.261 |    10738 | with,without,within,withdraw,w
+   s,u,r,e |    2513 | 4.251 |    10685 | sure,pleasure,pressure,surely,
+   p,r,e,s |    1736 | 6.117 |    10625 | president,present,press,pressu
+   s,i,d,e |    1950 | 5.269 |    10275 | inside,side,outside,president,
+   t,i,m,e |    2260 | 4.507 |    10190 | time,times,sometimes,sometime,
+   s,h,e,d |    1826 | 5.500 |    10047 | finished,pushed,shed,punished,
+   e,a,c,h |    2274 | 4.408 |    10025 | each,teacher,teach,reach,beach
+   n,i,n,g |    1487 | 6.692 |     9951 | morning,running,evening,happen
+   f,a,t,h |    3534 | 2.806 |     9918 | father,grandfather,fathers,god
+   c,o,n,f |    1823 | 5.399 |     9846 | confused,conference,confidence
+   t,h,i,n |    2381 | 4.128 |     9833 | think,something,thing,anything
+   h,a,n,k |    3576 | 2.733 |     9774 | thank,thanks,hank,thanksgiving
+   s,p,e,c |    1711 | 5.642 |     9654 | special,respect,especially,sus
+   t,o,n,i |    3467 | 2.782 |     9649 | tonight,antonio,toni,astonishi
+   d,o,o,r |    3065 | 3.123 |     9575 | door,doors,doorbell,doorstep,d
+   s,i,s,t |    2023 | 4.709 |     9528 | sister,assistant,sisters,insis
+   k,n,o,w |    3412 | 2.788 |     9513 | know,knows,known,knowing,knowl
+   t,t,e,r |    1564 | 6.060 |     9480 | better,matter,letter,matters,l
+   w,a,t,c |    3452 | 2.744 |     9475 | watch,watching,watched,watches
+   e,m,e,n |    1566 | 6.016 |     9427 | gentlemen,statement,movement,a
+   s,s,e,d |    1854 | 5.061 |     9385 | missed,passed,dressed,pissed,k
+   m,u,r,d |    3293 | 2.829 |     9318 | murder,murdered,murderer,murde
+   h,o,u,s |    1957 | 4.740 |     9278 | house,thousand,thousands,house
+   w,a,n,t |    4880 | 1.897 |     9258 | want,wanted,wants,wanting,unwa
+   s,t,o,p |    3886 | 2.372 |     9217 | stop,stopped,stops,stopping,ch
+   t,a,l,k |    3391 | 2.701 |     9159 | talk,talking,talked,talks,talk
+   c,h,a,r |    1714 | 5.337 |     9148 | charlie,charge,richard,charact
+   i,g,h,t |    1387 | 6.556 |     9099 | right,night,might,tonight,figh
+   l,e,a,s |    2367 | 3.832 |     9070 | please,least,pleasure,release,
+   r,e,l,a |    2150 | 4.215 |     9065 | relax,relationship,related,rel
+   s,t,o,r |    1789 | 4.991 |     8931 | story,history,store,stories,st
+   t,o,r,y |    2219 | 3.998 |     8874 | story,history,victory,factory,
+   n,e,s,s |    1463 | 5.961 |     8722 | business,witness,happiness,goo
+   d,i,n,g |    1240 | 6.975 |     8652 | wedding,kidding,building,stand
+   n,a,t,i |    1443 | 5.971 |     8621 | national,nation,international,
+   e,n,e,d |    2167 | 3.933 |     8525 | happened,opened,threatened,fri
+   t,t,i,n |    1709 | 4.973 |     8504 | getting,sitting,putting,lettin
+   r,o,u,g |    2641 | 3.218 |     8500 | through,brought,rough,througho
+   i,s,t,e |    1643 | 5.169 |     8497 | listen,sister,listening,minist
+   s,o,m,e |    2179 | 3.831 |     8348 | some,something,someone,somebod
+   y,i,n,g |    1541 | 5.414 |     8344 | trying,saying,playing,lying,cr
+   g,r,e,e |    1734 | 4.812 |     8344 | agree,green,agreed,agreement,d
+   n,e,e,d |    3373 | 2.448 |     8257 | need,needs,needed,needle,needi
+   t,u,r,n |    2252 | 3.659 |     8244 | turn,return,turned,turns,turni
+   n,g,e,r |    1503 | 5.478 |     8235 | longer,dangerous,danger,finger
+   l,l,i,n |    1495 | 5.487 |     8203 | telling,calling,killing,willin
+   s,u,p,p |    1998 | 4.091 |     8176 | supposed,suppose,support,suppl
+   p,a,r,t |    1609 | 5.072 |     8165 | part,party,apartment,partner,d
+   g,o,o,d |    2779 | 2.917 |     8108 | good,goodbye,good-bye,goodness
+   k,e,e,p |    2794 | 2.899 |     8098 | keep,keeping,keeps,keeper,hous
+   s,s,e,s |    1480 | 5.455 |     8075 | glasses,witnesses,classes,pass
+   r,s,o,n |    1816 | 4.432 |     8049 | person,personal,personally,per
+   i,n,t,e |    1204 | 6.652 |     8011 | interesting,interested,interes
+   m,e,d,i |    1730 | 4.602 |     7962 | immediately,medical,medicine,m
+   f,r,i,e |    2207 | 3.603 |     7953 | friend,friends,girlfriend,boyf
+   d,i,f,f |    2496 | 3.184 |     7950 | different,difficult,difference
+   p,h,o,n |    2097 | 3.756 |     7876 | phone,telephone,phones,cellpho
+   f,o,u,n |    2684 | 2.924 |     7849 | found,foundation,fountain,prof
+   f,f,i,c |    1928 | 4.058 |     7827 | office,officer,difficult,offic
+  prefix   | st.dev  | entr  | std*ent  |            examples           
+--------------------------------------------------------------------------------
+   t,i,o,n |    1259 | 9.139 |     7621 | question,questions,information
+   t,h,e,r |     592 | 5.760 |     7333 | there,other,father,mother,anot
+   i,g,h,t |    1387 | 6.556 |     6187 | right,night,might,tonight,figh
+   t,i,n,g |    1569 | 8.163 |     6002 | getting,waiting,meeting,intere
+   e,v,e,r |    2895 | 4.902 |     5749 | never,everything,ever,every,ev
+   k,i,n,g |    1690 | 6.611 |     5378 | talking,looking,fucking,thinki
+   t,h,i,n |    2381 | 4.128 |     5189 | think,something,thing,anything
+   d,i,n,g |    1240 | 6.975 |     4636 | wedding,kidding,building,stand
+   n,i,n,g |    1487 | 6.692 |     4426 | morning,running,evening,happen
+   h,i,n,g |    1360 | 5.647 |     4187 | something,thing,anything,nothi
+   n,d,e,r |    2225 | 6.570 |     4143 | understand,under,wonderful,won
+   s,o,m,e |    2179 | 3.831 |     3964 | some,something,someone,somebod
+   h,e,r,e |    3200 | 3.949 |     3878 | there,here,where,somewhere,any
+   r,i,n,g |     928 | 7.373 |     3618 | bring,during,ring,wearing,ring
+   y,i,n,g |    1541 | 5.414 |     3590 | trying,saying,playing,lying,cr
+   s,t,e,r |     660 | 6.779 |     3512 | sister,master,yesterday,faster
+   o,v,e,r |    1064 | 6.511 |     3490 | over,government,cover,discover
+   l,i,n,g |     861 | 7.416 |     3477 | telling,feeling,calling,darlin
+   a,t,i,o |    1715 | 8.291 |     3412 | information,station,situation,
+   e,n,c,e |     644 | 6.393 |     3324 | evidence,difference,experience
+   s,i,n,g |     600 | 6.548 |     3261 | missing,sing,using,single,sing
+   t,t,e,r |    1564 | 6.060 |     3239 | better,matter,letter,matters,l
+   a,l,l,y |    1886 | 6.110 |     3172 | really,actually,finally,totall
+   t,i,m,e |    2260 | 4.507 |     3094 | time,times,sometimes,sometime,
+   s,t,a,n |    1349 | 5.621 |     3084 | understand,stand,standing,dist
+   s,i,o,n |     644 | 6.876 |     3065 | decision,mission,permission,pr
+   m,e,n,t |    1664 | 7.527 |     3054 | moment,government,apartment,de
+   o,u,g,h |     884 | 4.634 |     2999 | thought,through,enough,though,
+   o,t,h,e |    1007 | 4.610 |     2993 | other,mother,another,brother,o
+   o,u,n,d |    1286 | 5.452 |     2984 | around,found,sounds,sound,roun
+   k,n,o,w |    3412 | 2.788 |     2924 | know,knows,known,knowing,knowl
+   n,t,e,r |     692 | 6.511 |     2922 | interesting,interested,interes
+   e,n,t,i |     564 | 6.434 |     2897 | entire,attention,mention,menti
+   d,e,r,s |    1969 | 5.461 |     2820 | understand,orders,understood,u
+   o,u,l,d |    1906 | 3.062 |     2797 | would,could,should,wouldn,coul
+   r,i,g,h |    1117 | 3.842 |     2791 | right,alright,bright,rights,fr
+   s,i,d,e |    1950 | 5.269 |     2733 | inside,side,outside,president,
+   e,s,t,i |    1188 | 5.786 |     2731 | question,questions,interesting
+   e,v,e,n |    1858 | 4.079 |     2710 | even,evening,seven,revenge,eve
+   e,a,s,e |    2789 | 4.164 |     2700 | please,release,pleased,disease
+   d,o,w,n |    3284 | 3.874 |     2650 | down,downstairs,downtown,break
+   u,n,d,e |    2207 | 5.545 |     2611 | understand,under,understood,un
+   e,n,t,s |     606 | 6.219 |     2609 | parents,students,patients,mome
+   i,o,n,s |    1619 | 7.514 |     2564 | questions,relationship,congrat
+   s,t,a,r |    1342 | 4.965 |     2544 | start,started,star,bastard,sta
+   n,e,s,s |    1463 | 5.961 |     2531 | business,witness,happiness,goo
+   u,g,h,t |      29 | 4.295 |     2505 | thought,daughter,brought,caugh
+   e,c,t,i |     439 | 6.171 |     2472 | detective,expecting,connection
+   y,o,u,r |    1444 | 1.790 |     2457 | your,yourself,yours,yourselves
+   e,r,i,n |     850 | 6.326 |     2438 | wondering,cheering,suffering,c
+   e,r,e,d |     352 | 6.155 |     2415 | murdered,ordered,discovered,co
+   s,u,r,e |    2513 | 4.251 |     2375 | sure,pleasure,pressure,surely,
+   t,a,k,e |     893 | 3.630 |     2338 | take,taken,takes,mistake,mista
+   e,t,t,e |     754 | 4.369 |     2324 | better,letter,letters,cigarett
+   i,n,g,s |     432 | 6.036 |     2319 | things,rings,feelings,brings,w
+   r,e,a,t |    1164 | 5.235 |     2286 | great,treat,breath,breathe,gre
+   e,m,e,n |    1566 | 6.016 |     2254 | gentlemen,statement,movement,a
+   t,u,r,e |    1240 | 6.153 |     2245 | future,picture,pictures,nature
+   s,t,i,n |     306 | 6.297 |     2237 | interesting,indistinct,disgust
+   d,e,n,t |     946 | 5.437 |     2230 | president,accident,student,stu
+   s,t,r,a |     451 | 6.247 |     2226 | straight,strange,stranger,stra
+   s,p,e,c |    1711 | 5.642 |     2215 | special,respect,especially,sus
+   n,i,g,h |     807 | 3.864 |     2191 | night,tonight,nights,midnight,
+   n,g,e,r |    1503 | 5.478 |     2187 | longer,dangerous,danger,finger
+   a,n,c,e |     466 | 6.777 |     2184 | chance,dance,france,distance,c
+   t,h,a,n |    1223 | 3.224 |     2163 | thank,than,thanks,nathan,jonat
+   i,n,t,e |    1204 | 6.652 |     2156 | interesting,interested,interes
+   s,e,l,f |    3624 | 4.092 |     2106 | yourself,myself,himself,hersel
+   n,t,e,d |    1380 | 4.868 |     2104 | wanted,disappointed,invented,g
+   e,a,r,s |    1848 | 4.072 |     2099 | years,ears,tears,clears,appear
+   t,t,l,e |     914 | 3.990 |     2058 | little,battle,bottle,settle,se
+   t,e,l,l |    1256 | 3.441 |     2053 | tell,telling,tells,intelligenc
+   n,t,i,n |     548 | 5.791 |     2045 | continue,continues,grunting,pa
+   e,s,s,i |      11 | 6.093 |     2028 | professional,impressive,impres
+   t,i,v,e |     339 | 6.635 |     2017 | detective,positive,negative,se
+   e,a,c,h |    2274 | 4.408 |     2015 | each,teacher,teach,reach,beach
+   r,e,s,s |     663 | 6.328 |     1982 | dress,address,press,pressure,d
+   r,e,a,l |    2125 | 3.585 |     1981 | really,real,realize,realized,r
+   e,s,s,e |     258 | 5.927 |     1981 | dressed,witnesses,jesse,impres
+   y,e,a,r |     838 | 3.830 |     1975 | years,year,yearbook,yearning,1
+   a,b,l,e |     488 | 6.972 |     1964 | able,table,comfortable,availab
+   g,o,o,d |    2779 | 2.917 |     1962 | good,goodbye,good-bye,goodness
+   t,t,i,n |    1709 | 4.973 |     1947 | getting,sitting,putting,lettin
+   e,r,a,t |     866 | 6.079 |     1925 | operation,desperate,generation
+   l,i,k,e |     813 | 2.501 |     1924 | like,liked,likes,likely,unlike
+   i,s,t,e |    1643 | 5.169 |     1905 | listen,sister,listening,minist
+   s,t,o,r |    1789 | 4.991 |     1902 | story,history,store,stories,st
+   t,h,a,t |    3156 | 1.150 |     1843 | that,that-,thats,that-that,'th
+   m,i,n,g |      31 | 5.831 |     1842 | coming,screaming,becoming,char
+   n,d,i,n |    1093 | 5.666 |     1824 | standing,finding,sending,spend
+   t,h,o,u |    1842 | 3.335 |     1810 | thought,without,though,thousan
+   s,s,i,o |    1084 | 5.737 |     1809 | mission,permission,professiona
+   r,e,s,t |     773 | 5.460 |     1805 | rest,interesting,interested,ar
+   l,e,a,s |    2367 | 3.832 |     1801 | please,least,pleasure,release,
+   t,a,i,n |     761 | 5.398 |     1795 | captain,certainly,certain,moun
+   l,a,t,e |    2156 | 5.366 |     1787 | later,late,lately,plate,chocol
+   l,o,o,k |    2350 | 2.888 |     1782 | look,looking,looks,looked,look
+   a,p,p,e |     509 | 5.046 |     1774 | happened,happen,happens,happen
+   e,a,t,h |    1565 | 4.399 |     1774 | death,breath,breathe,breathing
+   t,e,r,s |     208 | 6.415 |     1750 | matters,letters,sisters,headqu
