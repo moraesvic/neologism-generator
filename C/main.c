@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SOURCEFILE "../data/cn.txt"
+#define SOURCEFILE "../data/ru_50k.txt"
 
 #define OTHER_BYTES  0x80
 #define BYTE_TWO     0xc0

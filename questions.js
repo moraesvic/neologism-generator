@@ -52,7 +52,6 @@ function isByteGroupInArray(byteGroup, arr){
 
 function genCodec(readBuf){
   let arr = {};
-  console.log(readBuf);
   for(let i = 0; i < readBuf.length; i++){
     let ch = readBuf[i];
     let byteGroup = [ch];
@@ -77,11 +76,21 @@ function genCodec(readBuf){
   return codec;
 }
 
+function printCodec(codec){
+  for(let i = 0; i < codec.length; i++){
+    let s = '';
+    for(let j = 0; j < codec[i].length; j++)
+        s += codec[i][j].toString(16) + ' ';
+    console.log(s);
+  }
+}
+
 {
   readFile(DATA + 'ru_50k.txt')
   .then( fileContent => {
     let codec = genCodec(fileContent);
-    
+    printCodec(codec);
+    exit(0);
 
     let buf = Buffer.alloc(fileContent.length); // mudar para write
     let offset = 0;
@@ -136,7 +145,9 @@ function genCodec(readBuf){
       dic.push({word: temp[0], freq: Number(temp[1])});
     });
     return dic;
-  })
+  });
+}
+  /*
   .then( dic => {
     const MAX_LENGTH = 50;
     let wordsWithLength = new Array(MAX_LENGTH).fill(0);
@@ -153,3 +164,5 @@ function genCodec(readBuf){
     console.log(avg);
   });
 }
+
+*/
