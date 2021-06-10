@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SOURCEFILE "../data/ru_50k.txt"
+#define SOURCEFILE "../data/ascii.txt"
 
 #define OTHER_BYTES  0x80
 #define BYTE_TWO     0xc0
@@ -109,7 +109,7 @@ int match(unsigned char * buf, int i, CodecKey cdcKey){
 unsigned char * encode(unsigned char * readBuf, unsigned sz, CodecKey * codec){
   unsigned char * writeBuf = calloc(sz, sizeof(char));
   unsigned i, j, ret, offset = 0;
-  for(i = 0; i < sz; )
+  for(i = 0; i < sz && offset < sz; )
     for(j = 0; codec[j].cdpt != 0; j++){
       ret = match(readBuf, i, codec[j]);
       if(ret){
@@ -126,10 +126,14 @@ unsigned char * decode(unsigned char * readBuf, unsigned sz, CodecKey * codec){
   unsigned i, j, offset = 0;
   unsigned char * towrite;
 
-  for(i = 0; readBuf[i] != 0; i++){
+  for(i = 0; readBuf[i] != 0 && offset < sz; i++){
+    //printf("we read %x from encoded\nwriting bytes: ", readBuf[i]);
     towrite = codec[ readBuf[i] - 1 ].byteGroup;
-    for(j = 0; towrite[j] != 0; j++)
+    for(j = 0; towrite[j] != 0 && j < 4; j++){
       writeBuf[offset++] = towrite[j];
+      //printf("%x ", towrite[j]);
+    }
+    //printf("\n");
   }
   return writeBuf;
 }
@@ -151,11 +155,13 @@ int main(){
   readBuf = bufFromFile(fstr, &sz);
   codec = genCodec(readBuf, sz);
   encodedBuf = encode(readBuf, sz, codec); // change name
+  // fwrite(encodedBuf, sizeof(char), 100, stdout);
+  // return 0;
   tail = getTail(encodedBuf, sz);
   // printf("%d\n", sz - tail);
 
-  decodedBuf = decode(readBuf, sz, codec);
-  fwrite(readBuf, sizeof(char), 100, stdout);
+  decodedBuf = decode(encodedBuf, sz, codec);
+  fwrite(decodedBuf, sizeof(char), sz, stdout);
 
   free(readBuf);
   free(codec);
