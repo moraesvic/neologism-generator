@@ -6,8 +6,13 @@ const util = require('util');
 const DATA = path.join(__dirname, '/data/');
 const readFile = util.promisify(fs.readFile);
 
-/* QUESTION 1 - how long is the avg English word? */
-/* QUESTION 2 - how many different characters does our alphabet have? */
+/* QUESTION 1 - how long is the avg English word?
+   BETWEEN 4 AND 5 CHARACTERS.
+*/
+
+/* QUESTION 2 - how many different characters does our alphabet have?
+   AT MOST SOME 60-70, considering diacritics
+*/
 
 const OTHER_BYTES = 0x80;
 const BYTE_TWO = 0xc0;
@@ -25,8 +30,6 @@ function readUnicode(buf, i, n, decode){
   return n;
 }
 
-POWER_TWO = [1,256,65536,16777216]
-
 function match(buf, i, codec){
   for(let j = 0; j < codec.length; j++)
     if(buf[i+j] !== codec[j])
@@ -34,35 +37,52 @@ function match(buf, i, codec){
   return codec.length;
 }
 
-{
-  readFile(DATA + 'pt_br_50k.txt')
-  .then( fileContent => {
-    let arr = {};
-    console.log(fileContent); // mudar para read
-    for(let i = 0; i < fileContent.length; i++){
-      let ch = fileContent[i];
-      // console.log(`reading position ${i}, ch=${ch}`);
-      let decode = [ch];
-      if((ch & BYTE_FOUR) === BYTE_FOUR)
-        i += readUnicode(fileContent, i, 3, decode);
-      else if((ch & BYTE_THREE) === BYTE_THREE)
-        i += readUnicode(fileContent, i, 2, decode);
-      else if((ch & BYTE_TWO) === BYTE_TWO)
-        i += readUnicode(fileContent, i, 1, decode);
+class UTF8Ch{
+  constructor(byteGroup){
+    this.byteGroup = byteGroup;
+    let cdpt = 0;
+    for(let i = 0; j < byteGroup.length; i++)
+      cdpt += (byteGroup[i] << (i*8));
+  }
+}
 
-      let cdpt = 0;
-      for(let j = 0; j < decode.length; j++)
-        cdpt += (decode[j] << (j*8));
-      if(!(cdpt in arr))
-        arr[cdpt] = decode;
-    }
-    // console.log(arr);
-    let codec = []
-    Object.keys(arr).forEach( el => {
-      codec.push(arr[el]);
-    });
-    for(let i = 0; i < codec.length; i++)
-      ; //console.log('codec[%s] = %s', i.toString(16), codec[i]);
+function isByteGroupInArray(byteGroup, arr){
+
+}
+
+function genCodec(readBuf){
+  let arr = {};
+  console.log(readBuf);
+  for(let i = 0; i < readBuf.length; i++){
+    let ch = readBuf[i];
+    let byteGroup = [ch];
+    if((ch & BYTE_FOUR) === BYTE_FOUR)
+      i += readUnicode(readBuf, i, 3, byteGroup);
+    else if((ch & BYTE_THREE) === BYTE_THREE)
+      i += readUnicode(readBuf, i, 2, byteGroup);
+    else if((ch & BYTE_TWO) === BYTE_TWO)
+      i += readUnicode(readBuf, i, 1, byteGroup);
+
+    let cdpt = 0;
+    for(let j = 0; j < byteGroup.length; j++)
+      cdpt += (byteGroup[j] << (j*8));
+    if(!(cdpt in arr))
+      arr[cdpt] = byteGroup;
+  }
+  let codec = []
+  Object.keys(arr).forEach( el => {
+    codec.push(arr[el]);
+  });
+
+  return codec;
+}
+
+{
+  readFile(DATA + 'ru_50k.txt')
+  .then( fileContent => {
+    let codec = genCodec(fileContent);
+    
+
     let buf = Buffer.alloc(fileContent.length); // mudar para write
     let offset = 0;
     for(let i = 0; i < fileContent.length; )
@@ -85,7 +105,7 @@ function match(buf, i, codec){
     let newbuf = Buffer.alloc(fileContent.length);
     offset = 0;
     for(let i = 0; buf.readUInt8(i) !== 0; i++ ){
-      let towrite = codec[buf.readUInt8(i)-1];
+      let towrite = codec[buf.readUInt8(i)-1]; // important to subtract one
       for(let j = 0; j < towrite.length; j++)
         newbuf.writeUInt8(towrite[j], offset++);
     }

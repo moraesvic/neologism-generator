@@ -1,0 +1,3 @@
+多用途互联网邮件扩展（英語：Multipurpose Internet Mail Extensions，缩写：MIME）
+是一个互联网标准，它扩展了电子邮件标准，
+使其能够支持：
