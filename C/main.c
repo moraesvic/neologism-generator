@@ -54,18 +54,17 @@ CodecKey * genCodec(unsigned char * buf, int sz){
 
     inArray = 0;
     for(j = 0; j < offset; j++)
-      if(cdpt == codec[j].cdpt)
+      if(cdpt == codec[j].cdpt){
         inArray = 1;
+        break;
+      }
     
     if(!inArray){
-      // printf("not yet in array\n");
       codec[offset].cdpt = cdpt;
       for(j = 0; j < 4; j++)
         codec[offset].byteGroup[j] = byteGroup[j];
       offset++;
     }
-    else
-      ; //printf("already in array\n");
   }
   return codec;
 }
@@ -95,6 +94,10 @@ void printCodecKeys(CodecKey * cdcKey){
   }
 }
 
+void doNothing(CodecKey * cdcKey){
+  return;
+}
+
 int main(){
   char fstr[64] = SOURCEFILE;
   unsigned char * buf;
@@ -103,7 +106,8 @@ int main(){
   
   buf = bufFromFile(fstr, &sz);
   cdcKey = genCodec(buf, sz);
-  printCodecKeys(cdcKey);
+  doNothing(cdcKey);
+  // printCodecKeys(cdcKey);
 
   return 0; 
 }

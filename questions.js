@@ -37,21 +37,8 @@ function match(buf, i, codec){
   return codec.length;
 }
 
-class UTF8Ch{
-  constructor(byteGroup){
-    this.byteGroup = byteGroup;
-    let cdpt = 0;
-    for(let i = 0; j < byteGroup.length; i++)
-      cdpt += (byteGroup[i] << (i*8));
-  }
-}
-
-function isByteGroupInArray(byteGroup, arr){
-
-}
-
 function genCodec(readBuf){
-  let arr = {};
+  let codec = [];
   for(let i = 0; i < readBuf.length; i++){
     let ch = readBuf[i];
     let byteGroup = [ch];
@@ -65,14 +52,17 @@ function genCodec(readBuf){
     let cdpt = 0;
     for(let j = 0; j < byteGroup.length; j++)
       cdpt += (byteGroup[j] << (j*8));
-    if(!(cdpt in arr))
-      arr[cdpt] = byteGroup;
-  }
-  let codec = []
-  Object.keys(arr).forEach( el => {
-    codec.push(arr[el]);
-  });
+    
+    let inArray = 0;
+    for(let j = 0; j < codec.length; j++)
+      if(codec[j].cdpt === cdpt){
+        inArray = 1;
+        break;
+      }
 
+    if(!inArray)
+      codec.push({cdpt: cdpt, byteGroup: byteGroup});
+  }
   return codec;
 }
 
@@ -89,7 +79,7 @@ function printCodec(codec){
   readFile(DATA + 'ru_50k.txt')
   .then( fileContent => {
     let codec = genCodec(fileContent);
-    printCodec(codec);
+    // console.log(codec);
     exit(0);
 
     let buf = Buffer.alloc(fileContent.length); // mudar para write
