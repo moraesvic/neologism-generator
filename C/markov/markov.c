@@ -4,6 +4,8 @@
 #define BIGGEST_INPUT 0xffff
 #define ALPHABET_LENGTH 100
 
+const char separator = ' ';
+
 typedef struct trienode {
 
   unsigned freq;
@@ -78,6 +80,23 @@ void printNode(TrieNode * node){
         node->children[i]->freq);
 }
 
+void populateBelow(TrieNode * node, unsigned char maxdepth,
+      char * s, unsigned sz){
+  int i;
+  if(node->depth > maxdepth) return;
+  populateNode(node, s, sz);
+  for(i = 0; i < node->nChildren; i++)
+    populateBelow(node->children[i], maxdepth, s, sz);
+}
+
+int countBelow(TrieNode * node, unsigned char maxdepth){
+  int i, sum = 0;
+  if(node->depth == maxdepth) return 1;
+  for(i = 0; i < node->nChildren; i++)
+    sum += countBelow(node->children[i], maxdepth);
+  return sum;
+}
+
 int main(){
   char * s = calloc(BIGGEST_INPUT, sizeof(char));
   unsigned i, sz;
@@ -85,9 +104,22 @@ int main(){
   for(i = 1; s[i-1] != 0 && i < BIGGEST_INPUT; i++)
     scanf("%c", s+i);
   sz = i-1;
-  printf("%s\n", s);
+  // printf("%s\n", s);
 
   TrieNode * root = addChild(NULL, 0x00);
-  populateNode(root, s, sz);
+  populateBelow(root, 3, s, sz);
+  for(i = 0; i <= 10; i++)
+    printf("Level %d, n_nodes = %d\n", i, countBelow(root, i));
+
+  /*
   printNode(root);
+  printNode(root->children[0]);
+  printNode(root->children[1]);
+  printNode(root->children[2]);
+  printNode(root->children[3]);
+  printNode(root->children[4]);
+  printNode(root->children[0]->children[0]);
+  printNode(root->children[0]->children[1]);
+  printNode(root->children[0]->children[2]);
+  */
 }
