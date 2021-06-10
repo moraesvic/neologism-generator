@@ -95,25 +95,21 @@ function encode(readBuf, codec){
   readFile(DATA + 'ru_50k.txt')
   .then( readBuf => {
     let codec = genCodec(readBuf);
-    let writeBuf = encode(readBuf, codec);
+    let encodedBuf = encode(readBuf, codec);
   
     let tail;
-    for(tail = 0; tail < writeBuf.length; tail++)
-      if(writeBuf.readUInt8(writeBuf.length - tail - 1) !== 0)
+    for(tail = 0; tail < encodedBuf.length; tail++)
+      if(encodedBuf.readUInt8(encodedBuf.length - tail - 1) !== 0)
         break;
-        
-    console.log(writeBuf.length - tail);
 
-    exit(0);
-
-    let newbuf = Buffer.alloc(fileContent.length);
+    let newbuf = Buffer.alloc(readBuf.length);
     offset = 0;
-    for(let i = 0; buf.readUInt8(i) !== 0; i++ ){
-      let towrite = codec[buf.readUInt8(i)-1]; // important to subtract one
+    for(let i = 0; encodedBuf.readUInt8(i) !== 0; i++ ){
+      let towrite = codec[ encodedBuf.readUInt8(i)-1 ].byteGroup; // important to subtract one
       for(let j = 0; j < towrite.length; j++)
         newbuf.writeUInt8(towrite[j], offset++);
     }
-    console.log(newbuf);
+    console.log(newbuf.toString().slice(0, 100));
     exit(0);
     /* */
     let alph = {};

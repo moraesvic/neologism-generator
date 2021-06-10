@@ -121,6 +121,19 @@ unsigned char * encode(unsigned char * readBuf, unsigned sz, CodecKey * codec){
   return writeBuf;
 }
 
+unsigned char * decode(unsigned char * readBuf, unsigned sz, CodecKey * codec){
+  unsigned char * writeBuf = calloc(sz, sizeof(char));
+  unsigned i, j, offset = 0;
+  unsigned char * towrite;
+
+  for(i = 0; readBuf[i] != 0; i++){
+    towrite = codec[ readBuf[i] - 1 ].byteGroup;
+    for(j = 0; towrite[j] != 0; j++)
+      writeBuf[offset++] = towrite[j];
+  }
+  return writeBuf;
+}
+
 unsigned getTail(unsigned char * buf, unsigned sz){ /* inline ? */
   unsigned tail;
   for(tail = 0; tail < sz; tail++)
@@ -131,18 +144,22 @@ unsigned getTail(unsigned char * buf, unsigned sz){ /* inline ? */
 
 int main(){
   char fstr[64] = SOURCEFILE;
-  unsigned char * readBuf, * writeBuf;
+  unsigned char * readBuf, * encodedBuf, * decodedBuf;
   unsigned sz, tail;
   CodecKey * codec;
   
   readBuf = bufFromFile(fstr, &sz);
   codec = genCodec(readBuf, sz);
-  writeBuf = encode(readBuf, sz, codec);
-  tail = getTail(writeBuf, sz);
-  printf("%d\n", sz - tail);
+  encodedBuf = encode(readBuf, sz, codec); // change name
+  tail = getTail(encodedBuf, sz);
+  // printf("%d\n", sz - tail);
+
+  decodedBuf = decode(readBuf, sz, codec);
+  fwrite(readBuf, sizeof(char), 100, stdout);
 
   free(readBuf);
   free(codec);
-  free(writeBuf);
+  free(encodedBuf);
+  free(decodedBuf);
   return 0; 
 }
