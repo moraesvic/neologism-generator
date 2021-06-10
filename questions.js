@@ -31,10 +31,10 @@ function readUnicode(buf, i, n, decode){
 }
 
 function match(buf, i, codec){
-  for(let j = 0; j < codec.length; j++)
-    if(buf[i+j] !== codec[j])
+  for(let j = 0; j < codec.byteGroup.length; j++)
+    if(buf[i+j] !== codec.byteGroup[j])
       return 0;
-  return codec.length;
+  return codec.byteGroup.length;
 }
 
 function genCodec(readBuf){
@@ -75,31 +75,36 @@ function printCodec(codec){
   }
 }
 
+function encode(readBuf, codec){
+  let writeBuf = Buffer.alloc(readBuf.length);
+  let offset = 0;
+  for(let i = 0; i < readBuf.length; )
+    for(let j = 0; j < codec.length; j++){
+      let ret = match(readBuf, i, codec[j]);
+      if(ret){
+        // console.log(`${fileContent[i]} matches codec[${j}]=${codec[j]}`);
+        writeBuf.writeUInt8(j+1, offset++); // important to add 1, we don't want 0
+        i += ret;
+        break;
+      }
+    }
+  return writeBuf;
+}
+
 {
   readFile(DATA + 'ru_50k.txt')
-  .then( fileContent => {
-    let codec = genCodec(fileContent);
-    // console.log(codec);
-    exit(0);
-
-    let buf = Buffer.alloc(fileContent.length); // mudar para write
-    let offset = 0;
-    for(let i = 0; i < fileContent.length; )
-      for(let j = 0; j < codec.length; j++){
-        let ret = match(fileContent, i, codec[j]);
-        if(ret){
-          // console.log(`${fileContent[i]} matches codec[${j}]=${codec[j]}`);
-          buf.writeUInt8(j+1, offset++); // important to add 1, we don't want 0
-          i += ret;
-          break;
-        }
-      }
+  .then( readBuf => {
+    let codec = genCodec(readBuf);
+    let writeBuf = encode(readBuf, codec);
+  
     let tail;
-    for(tail = 1; tail < buf.length; tail++)
-      if(buf.readUInt8(buf.length - tail) !== 0)
+    for(tail = 0; tail < writeBuf.length; tail++)
+      if(writeBuf.readUInt8(writeBuf.length - tail - 1) !== 0)
         break;
-    console.log(buf);
-    console.log(buf.length - tail + 1);
+        
+    console.log(writeBuf.length - tail);
+
+    exit(0);
 
     let newbuf = Buffer.alloc(fileContent.length);
     offset = 0;

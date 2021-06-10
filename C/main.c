@@ -14,7 +14,7 @@ typedef struct {
   unsigned char byteGroup[4];
 } CodecKey;
 
-void fillZero(unsigned char * arr, int sz){
+void fillZero(unsigned char * arr, unsigned sz){
   int i;
   for(i = 0; i < sz; i++)
     arr[i] = 0;
@@ -32,7 +32,7 @@ int readUnicode(unsigned char * buf, int i, int n, unsigned char * byteGroup){
   return n;
 }
 
-CodecKey * genCodec(unsigned char * buf, int sz){
+CodecKey * genCodec(unsigned char * buf, unsigned sz){
   CodecKey * codec = calloc(255, sizeof(CodecKey));
   unsigned offset = 0;
   int i, j, cdpt, inArray;
@@ -69,7 +69,7 @@ CodecKey * genCodec(unsigned char * buf, int sz){
   return codec;
 }
 
-unsigned char * bufFromFile(char * fstr, int * sz){
+unsigned char * bufFromFile(char * fstr, unsigned * sz){
   FILE * f;
   unsigned char * buf;
 
@@ -98,16 +98,51 @@ void doNothing(CodecKey * cdcKey){
   return;
 }
 
+int match(unsigned char * buf, int i, CodecKey cdcKey){
+  int j;
+  for(j = 0; cdcKey.byteGroup[j] != 0 && j < 4; j++)
+    if(buf[i+j] != cdcKey.byteGroup[j])
+      return 0;
+  return j;
+}
+
+unsigned char * encode(unsigned char * readBuf, unsigned sz, CodecKey * codec){
+  unsigned char * writeBuf = calloc(sz, sizeof(char));
+  unsigned i, j, ret, offset = 0;
+  for(i = 0; i < sz; )
+    for(j = 0; codec[j].cdpt != 0; j++){
+      ret = match(readBuf, i, codec[j]);
+      if(ret){
+        writeBuf[offset++] = j+1;
+        i += ret;
+        break;
+      }
+    }
+  return writeBuf;
+}
+
+unsigned getTail(unsigned char * buf, unsigned sz){ /* inline ? */
+  unsigned tail;
+  for(tail = 0; tail < sz; tail++)
+    if(buf[sz - tail - 1] != 0)
+      break;
+  return tail;
+}
+
 int main(){
   char fstr[64] = SOURCEFILE;
-  unsigned char * buf;
-  int sz;
-  CodecKey * cdcKey;
+  unsigned char * readBuf, * writeBuf;
+  unsigned sz, tail;
+  CodecKey * codec;
   
-  buf = bufFromFile(fstr, &sz);
-  cdcKey = genCodec(buf, sz);
-  doNothing(cdcKey);
-  // printCodecKeys(cdcKey);
+  readBuf = bufFromFile(fstr, &sz);
+  codec = genCodec(readBuf, sz);
+  writeBuf = encode(readBuf, sz, codec);
+  tail = getTail(writeBuf, sz);
+  printf("%d\n", sz - tail);
 
+  free(readBuf);
+  free(codec);
+  free(writeBuf);
   return 0; 
 }
