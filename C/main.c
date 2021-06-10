@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SOURCEFILE "../data/ascii.txt"
+#define SOURCEFILE "../data/ru_50k.txt"
 
 #define OTHER_BYTES  0x80
 #define BYTE_TWO     0xc0
@@ -161,7 +161,7 @@ int main(){
   // printf("%d\n", sz - tail);
 
   decodedBuf = decode(encodedBuf, sz, codec);
-  fwrite(decodedBuf, sizeof(char), sz, stdout);
+  fwrite(decodedBuf, sizeof(char), 100, stdout);
 
   free(readBuf);
   free(codec);
