@@ -20,7 +20,6 @@ typedef struct trienode {
 } TrieNode;
 
 TrieNode * addChild(TrieNode * parent, char ch){
-  int i;
   TrieNode * child = malloc(sizeof(TrieNode));
   child->depth = (parent == NULL ? 0 : parent->depth + 1);
   child->freq = 1;
@@ -28,9 +27,8 @@ TrieNode * addChild(TrieNode * parent, char ch){
   
   child->str = calloc(child->depth, sizeof(char));
   if(parent != NULL){
-    for(i = 0; i < parent->depth; i++) // strncpy(child->str, parent->str, parent->depth);
-      child->str[i] = parent->str[i];
-    child->str[i] = ch;
+    strncpy(child->str, parent->str, parent->depth);
+    child->str[parent->depth] = ch;
   }
   child->nChildren = 0;
   child->children = calloc(ALPHABET_LENGTH, sizeof(TrieNode *));
@@ -120,9 +118,8 @@ TrieNode * navigateTrie(TrieNode * root, char * str){
 
 TrieNode * getRandomChild(TrieNode * node){
   int i, sum = 0, r = randint_mod(node->freqChildren);
-  // printf("random number is %d \n", r);
   if(node == NULL || node->nChildren == 0){
-    printf("an error happened!!!\n");
+    fprintf(stderr,"Error: could not get random child. Node is either NULL or has no children.\n");
     return NULL;
   }
   for(i = 0; i < node->nChildren; i++){
@@ -130,9 +127,8 @@ TrieNode * getRandomChild(TrieNode * node){
     if(r < sum)
       return node->children[i];
   }
-  printf("you should never reach here\n");
+  fprintf(stderr, "Implementation error: was not able to get a random child\n"); 
   return NULL;
-//   return node->children[node->nChildren - 1];
 }
 
 int main(){
@@ -161,13 +157,4 @@ int main(){
     child = getRandomChild(inspect);
     printf("%c ", child->str[child->depth - 1]);
   }
-  /*
-  printNode(root->children[1]);
-  printNode(root->children[2]);
-  printNode(root->children[3]);
-  printNode(root->children[4]);
-  
-  printNode(root->children[0]->children[1]);
-  printNode(root->children[0]->children[2]);
-  */
 }
