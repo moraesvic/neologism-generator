@@ -107,7 +107,7 @@ int main(){
   // printf("%s\n", s);
 
   TrieNode * root = addChild(NULL, 0x00);
-  populateBelow(root, 3, s, sz);
+  populateBelow(root, 4, s, sz);
   for(i = 0; i <= 10; i++)
     printf("Level %d, n_nodes = %d\n", i, countBelow(root, i));
 
