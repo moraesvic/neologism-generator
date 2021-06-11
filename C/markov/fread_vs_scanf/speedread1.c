@@ -4,6 +4,7 @@
 
 int main(){
   char input[MAX_LEN];
-  fread(input, sizeof(char), MAX_LEN, stdin);
+  int i, sz;
+  sz = fread(input, 1, MAX_LEN, stdin);
   return 0;
 }
