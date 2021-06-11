@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include "my_random.h"
 
 #define BIGGEST_INPUT 0xffff
 #define ALPHABET_LENGTH 100
@@ -26,7 +28,7 @@ TrieNode * addChild(TrieNode * parent, char ch){
   
   child->str = calloc(child->depth, sizeof(char));
   if(parent != NULL){
-    for(i = 0; i < parent->depth; i++)
+    for(i = 0; i < parent->depth; i++) // strncpy(child->str, parent->str, parent->depth);
       child->str[i] = parent->str[i];
     child->str[i] = ch;
   }
@@ -97,6 +99,42 @@ int countBelow(TrieNode * node, unsigned char maxdepth){
   return sum;
 }
 
+TrieNode * findInNode(TrieNode * node, char ch){
+  int i;
+  for(i = 0; i < node->nChildren; i++)
+    if(node->children[i]->str[ node->depth ] == ch)
+      return node->children[i];
+  return NULL;
+}
+
+TrieNode * navigateTrie(TrieNode * root, char * str){
+  TrieNode * node = root;
+  const int sz = strlen(str);
+  int i;
+  for(i = 0; i < sz; i++){
+    node = findInNode(node, str[i]);
+    if(node == NULL) return NULL;
+  }
+  return node;
+}
+
+TrieNode * getRandomChild(TrieNode * node){
+  int i, sum = 0, r = randint_mod(node->freqChildren);
+  // printf("random number is %d \n", r);
+  if(node == NULL || node->nChildren == 0){
+    printf("an error happened!!!\n");
+    return NULL;
+  }
+  for(i = 0; i < node->nChildren; i++){
+    sum += node->children[i]->freq;
+    if(r < sum)
+      return node->children[i];
+  }
+  printf("you should never reach here\n");
+  return NULL;
+//   return node->children[node->nChildren - 1];
+}
+
 int main(){
   char * s = calloc(BIGGEST_INPUT, sizeof(char));
   unsigned i, sz;
@@ -111,14 +149,24 @@ int main(){
   for(i = 0; i <= 10; i++)
     printf("Level %d, n_nodes = %d\n", i, countBelow(root, i));
 
-  /*
+  
   printNode(root);
   printNode(root->children[0]);
+  printNode(root->children[0]->children[0]);
+
+  TrieNode * inspect = navigateTrie(root, "con");
+  TrieNode * child;
+  printNode(inspect);
+  for(i = 0; i < 100; i++){
+    child = getRandomChild(inspect);
+    printf("%c ", child->str[child->depth - 1]);
+  }
+  /*
   printNode(root->children[1]);
   printNode(root->children[2]);
   printNode(root->children[3]);
   printNode(root->children[4]);
-  printNode(root->children[0]->children[0]);
+  
   printNode(root->children[0]->children[1]);
   printNode(root->children[0]->children[2]);
   */
