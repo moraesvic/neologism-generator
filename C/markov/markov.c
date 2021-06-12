@@ -1,26 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "my_random.h"
-
-#define BIGGEST_INPUT 0xffff
-#define ALPHABET_LENGTH 100
-#define MAX_WORD_LENGTH 20
-
-#define TRIE_DEPTH 3
-#define SEPARATOR_CH  ' '
-#define SEPARATOR_STR " "
-
-typedef struct trienode {
-
-  unsigned freq;
-  unsigned freqChildren;
-  char * str;
-  struct trienode ** children;
-  unsigned char depth;
-  unsigned char nChildren;
-
-} TrieNode;
+#include "markov.h"
 
 TrieNode * addChild(TrieNode * parent, char ch){
   TrieNode * child = malloc(sizeof(TrieNode));
@@ -74,6 +52,57 @@ void populateNode(TrieNode * node, char * s, unsigned sz){
     }
 }
 
+int matchEnd(TrieNode * node, char * word){
+  int i, sz = strlen(word);
+
+  if(node->depth == 0)
+    return 0;
+
+  if(sz < node->depth)
+    return 0;
+
+  for(i = 0; i < node->depth; i++)
+    if(word[sz - node->depth + i] != node->str[i])
+      return 0;
+  return 1;
+}
+
+void feedWordNode(TrieNode * node, char * word, unsigned freq){
+  int i, childId;
+  int sz = strlen(word);
+  TrieNode * child;
+
+  if(matchEnd(node, word)){
+    /* printf("--- MATCH END ---\n");
+    printNode(node);
+    printf("%s\n", word); */
+    childId = inChildren(node, END_OF_WORD);
+    if(childId == -1){
+      child = addChild(node, END_OF_WORD);
+      child->freq += freq - 1; // 1 will be already be added in addChild
+      node->freqChildren += freq - 1; // same
+    }
+    else{
+      node->children[childId]->freq += freq;
+      node->freqChildren += freq;
+    }
+  }
+
+  for(i = 0; i + node->depth < sz; i++)
+    if(matchPrefix(node, word, i)){
+      childId = inChildren(node, word[i + node->depth]);
+      if(childId == -1){
+        child = addChild(node, word[i + node->depth]);
+        child->freq += freq - 1; // 1 will be already be added in addChild
+        node->freqChildren += freq - 1; // same
+      }
+      else{
+        node->children[childId]->freq += freq;
+        node->freqChildren += freq;
+      }
+    }
+}
+
 void printNode(TrieNode * node){
   int i;
   printf("depth: %u, prefix <%s> nChildren: %u, freqChildren: %u\n",
@@ -90,6 +119,15 @@ void populateBelow(TrieNode * node, unsigned char maxdepth,
   populateNode(node, s, sz);
   for(i = 0; i < node->nChildren; i++)
     populateBelow(node->children[i], maxdepth, s, sz);
+}
+
+void feedWordBelow(TrieNode * node, unsigned char maxdepth,
+      char * word, unsigned freq){
+    int i;
+    if(node->depth > maxdepth) return;
+    feedWordNode(node, word, freq);
+    for(i = 0; i < node->nChildren; i++)
+      feedWordBelow(node->children[i], maxdepth, word, freq);
 }
 
 int countBelow(TrieNode * node, unsigned char maxdepth){
@@ -120,7 +158,8 @@ TrieNode * navigateTrie(TrieNode * root, char * str){
 }
 
 TrieNode * getRandomChild(TrieNode * node){
-  int i, sum = 0, r = randint_mod(node->freqChildren);
+  int i;
+  unsigned sum = 0, r = randint_mod(node->freqChildren);
   if(node == NULL || node->nChildren == 0){
     fprintf(stderr,"Error: could not get random child. Node is either NULL or has no children.\n");
     return NULL;
@@ -131,6 +170,9 @@ TrieNode * getRandomChild(TrieNode * node){
       return node->children[i];
   }
   fprintf(stderr, "Implementation error: was not able to get a random child\n"); 
+  fprintf(stderr, "freqChildren: %u, r: %u, sum: %u\n",
+        node->freqChildren, r, sum);
+  printNode(node);
   return NULL;
 }
 
@@ -154,7 +196,7 @@ void strSlice(char * buf, char * src, int start, int end){
   buf[i] = '\0';
 }
 
-char * stringFromScratch(TrieNode * root){
+char * stringFromScratchBigText(TrieNode * root){
   int len, i;
   TrieNode *node;
   char * nav = calloc(TRIE_DEPTH + 1, sizeof(char)); // to fit null-byte
@@ -164,19 +206,13 @@ char * stringFromScratch(TrieNode * root){
   len = 1;
 
   while(len < MAX_WORD_LENGTH){
-    // printf("len: %d\n", len);
     if(len > TRIE_DEPTH)
       strSlice(nav, ptr, len - TRIE_DEPTH, len);
     else
       strcpy(nav,ptr);
     
-    // printf("ptr: <%s>\n", ptr);
-    // printf("nav: <%s>\n", nav);
-
     node = navigateTrie(root, nav);
-    // printNode(node);
     node = getRandomChild( node );
-    // printf("randomChild: <%s>\n", node->str);
 
     if(node->str[node->depth - 1] == SEPARATOR_CH) break;
     ptr[len++] = node->str[node->depth - 1];
@@ -187,49 +223,77 @@ char * stringFromScratch(TrieNode * root){
   return ptr;
 }
 
+char * stringFromScratch(TrieNode * root){
+  int len;
+  TrieNode *node;
+  char * nav = calloc(TRIE_DEPTH, sizeof(char)); // to fit null-byte
+  char * ptr = calloc(MAX_WORD_LENGTH, sizeof(char));
+
+  strcpy(ptr, "");
+  len = 0;
+
+  while(len < MAX_WORD_LENGTH){
+    //printf("len: %d\n", len);
+    if(len > TRIE_DEPTH)
+      strSlice(nav, ptr, len - TRIE_DEPTH, len);
+    else
+      strcpy(nav,ptr);
+    
+    //printf("ptr: <%s>\n", ptr);
+    //printf("nav: <%s>\n", nav);
+
+    node = navigateTrie(root, nav);
+    //printNode(node);
+    node = getRandomChild( node );
+    //printf("randomChild: <%s>\n", node->str);
+
+    if(node->str[node->depth - 1] == END_OF_WORD) break;
+    ptr[len++] = node->str[node->depth - 1];
+  }
+
+  return ptr;
+}
+
 int main(){
   char * s = calloc(BIGGEST_INPUT, sizeof(char));
-  unsigned i, sz;
-  scanf("%c", s);
-  for(i = 1; s[i-1] != 0 && i < BIGGEST_INPUT; i++)
-    scanf("%c", s+i);
-  sz = i-1;
-
+  unsigned i;
   TrieNode * root = addChild(NULL, 0x00);
-  populateBelow(root, TRIE_DEPTH, s, sz);
+
+  
+  char * word = calloc(20, sizeof(char));
+  char * oldword = calloc(20, sizeof(char));
+  int freq;
+  do {
+    strcpy(oldword, word);
+    scanf("%s %d", word, &freq);
+    feedWordBelow(root, TRIE_DEPTH, word, freq);
+    // PS: last line is being read twice, fix it.
+  }
+  while(strcmp(oldword, word));
+  
+ /*
+  feedWordBelow(root, TRIE_DEPTH, "avocado", 100);
+  feedWordBelow(root, TRIE_DEPTH, "adevogado", 100);
+  feedWordBelow(root, TRIE_DEPTH, "acabado", 100);
+  feedWordBelow(root, TRIE_DEPTH, "dinossauro", 300);
+  */
+  
   for(i = 0; i <= 10; i++)
     printf("Level %d, n_nodes = %d\n", i, countBelow(root, i));
 
-  /*
+  
   printNode(root);
   printNode(root->children[0]);
   printNode(root->children[0]->children[0]);
-  printNode(root->children[0]->children[0]->children[0]);
-  printNode(root->children[0]->children[0]->children[0]->children[0]);
-  */
-
-  char ptr[MAX_WORD_LENGTH];
-  for(i = 0; i < 10; i++){
-    getRandomString( navigateTrie(root, " "), TRIE_DEPTH, ptr);
-    printf("%s\n", ptr);  
-  }
-
-  for(i = 0; i < 1000; i++){
+  // printNode(root->children[0]->children[1]->children[0]);
+  
+  for(i = 0; i < 1000; ){
     s = stringFromScratch(root);
     if(strlen(s) > 3){
       i++;
       printf("<%s>\n", s);
     }
   }
-  /*
-  TrieNode * inspect = navigateTrie(root, "con");
-  TrieNode * child;
-  printNode(inspect);
-  for(i = 0; i < 100; i++){
-    child = getRandomChild(inspect);
-    printf("%c ", child->str[child->depth - 1]);
-  }
-  */
 
   return 0;
 }
