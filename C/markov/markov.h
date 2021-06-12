@@ -10,6 +10,8 @@
 #define BIGGEST_INPUT 0xffff
 #define ALPHABET_LENGTH 100
 #define MAX_WORD_LENGTH 20
+#define WORD_BUFFER 100
+#define MAX_WORDS_READ 50000
 
 #define TRIE_DEPTH 3
 #define SEPARATOR_CH   ' '
@@ -27,6 +29,13 @@ typedef struct trienode {
 
 } TrieNode;
 
+typedef struct {
+  char *s;
+  unsigned freq;
+} Word;
+
+/* */
+
 
 TrieNode * addChild(TrieNode * parent, char ch);
 int matchPrefix(TrieNode * node, char * s, unsigned offset);
@@ -36,8 +45,7 @@ void feedWordNode(TrieNode * node, char * word, unsigned freq);
 void printNode(TrieNode * node);
 void populateBelow(TrieNode * node, unsigned char maxdepth,
       char * s, unsigned sz);
-void feedWordBelow(TrieNode * node, unsigned char maxdepth,
-      char * word, unsigned freq);
+void feedWordBelow(TrieNode * node, unsigned char maxdepth, Word * word);
 int countBelow(TrieNode * node, unsigned char maxdepth);
 TrieNode * findInNode(TrieNode * node, char ch);
 TrieNode * navigateTrie(TrieNode * root, char * str);

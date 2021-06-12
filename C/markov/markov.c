@@ -67,6 +67,17 @@ int matchEnd(TrieNode * node, char * word){
   return 1;
 }
 
+int matchBegin(TrieNode * node, char * word){
+  int i, sz = strlen(word);
+  if(sz < node->depth + 1)
+    return 0;
+
+  for(i = 0; i < node->depth; i++)
+    if(word[i] != node->str[i])
+      return 0;
+  return 1;
+}
+
 void feedWordNode(TrieNode * node, char * word, unsigned freq){
   int i, childId;
   int sz = strlen(word);
@@ -79,6 +90,8 @@ void feedWordNode(TrieNode * node, char * word, unsigned freq){
     childId = inChildren(node, END_OF_WORD);
     if(childId == -1){
       child = addChild(node, END_OF_WORD);
+      // this hack below is actually pretty ugly. Please change it
+      // for something more maintainable
       child->freq += freq - 1; // 1 will be already be added in addChild
       node->freqChildren += freq - 1; // same
     }
@@ -87,7 +100,22 @@ void feedWordNode(TrieNode * node, char * word, unsigned freq){
       node->freqChildren += freq;
     }
   }
-
+  if(matchBegin(node, word)){
+    /* printf("--- MATCH BEGIN ---\n");
+    printNode(node);
+    printf("%s\n", word); */
+    childId = inChildren(node, word[node->depth]);
+    if(childId == -1){
+      child = addChild(node, word[node->depth]);
+      child->freq += freq - 1; // 1 will be already be added in addChild
+      node->freqChildren += freq - 1; // same
+    }
+    else{
+      node->children[childId]->freq += freq;
+      node->freqChildren += freq;
+    }
+  }
+  
   for(i = 0; i + node->depth < sz; i++)
     if(matchPrefix(node, word, i)){
       childId = inChildren(node, word[i + node->depth]);
@@ -122,12 +150,12 @@ void populateBelow(TrieNode * node, unsigned char maxdepth,
 }
 
 void feedWordBelow(TrieNode * node, unsigned char maxdepth,
-      char * word, unsigned freq){
+      Word * word){
     int i;
     if(node->depth > maxdepth) return;
-    feedWordNode(node, word, freq);
+    feedWordNode(node, word->s, word->freq);
     for(i = 0; i < node->nChildren; i++)
-      feedWordBelow(node->children[i], maxdepth, word, freq);
+      feedWordBelow(node->children[i], maxdepth, word);
 }
 
 int countBelow(TrieNode * node, unsigned char maxdepth){
@@ -159,11 +187,13 @@ TrieNode * navigateTrie(TrieNode * root, char * str){
 
 TrieNode * getRandomChild(TrieNode * node){
   int i;
-  unsigned sum = 0, r = randint_mod(node->freqChildren);
+  unsigned sum, r;
   if(node == NULL || node->nChildren == 0){
     fprintf(stderr,"Error: could not get random child. Node is either NULL or has no children.\n");
     return NULL;
   }
+  sum = 0;
+  r = randint_mod(node->freqChildren);
   for(i = 0; i < node->nChildren; i++){
     sum += node->children[i]->freq;
     if(r < sum)
@@ -200,7 +230,7 @@ char * stringFromScratchBigText(TrieNode * root){
   int len, i;
   TrieNode *node;
   char * nav = calloc(TRIE_DEPTH + 1, sizeof(char)); // to fit null-byte
-  char * ptr = calloc(MAX_WORD_LENGTH + 1, sizeof(char));
+  char * ptr = calloc(MAX_WORD_LENGTH + 1, sizeof(char)); // to fit first " " char
 
   strcpy(ptr, SEPARATOR_STR);
   len = 1;
@@ -230,26 +260,26 @@ void myStrCopy(char *a, char *b){
 char * stringFromScratch(TrieNode * root){
   int len;
   TrieNode *node;
-  char * nav = calloc(TRIE_DEPTH, sizeof(char)); // to fit null-byte
+  char * nav = calloc(TRIE_DEPTH + 1, sizeof(char)); // to fit null-byte
   char * ptr = calloc(MAX_WORD_LENGTH, sizeof(char));
 
   strcpy(ptr, "");
   len = 0;
 
   while(len < MAX_WORD_LENGTH){
-    //printf("len: %d\n", len);
+    // printf("len: %d\n", len);
     if(len > TRIE_DEPTH)
       strSlice(nav, ptr, len - TRIE_DEPTH, len);
     else
       myStrCopy(nav,ptr);
     
-    //printf("ptr: <%s>\n", ptr);
-    //printf("nav: <%s>\n", nav);
+    // printf("ptr: <%s>\n", ptr);
+    // printf("nav: <%s>\n", nav);
 
     node = navigateTrie(root, nav);
-    //printNode(node);
+    // printNode(node);
     node = getRandomChild( node );
-    //printf("randomChild: <%s>\n", node->str);
+    // printf("randomChild: <%s>\n", node->str);
 
     if(node->str[node->depth - 1] == END_OF_WORD) break;
     ptr[len++] = node->str[node->depth - 1];
@@ -258,30 +288,62 @@ char * stringFromScratch(TrieNode * root){
   return ptr;
 }
 
-int main(){
-  char * s = calloc(BIGGEST_INPUT, sizeof(char));
-  unsigned i;
-  TrieNode * root = addChild(NULL, 0x00);
+Word  * newWord(char * s, unsigned freq){
+  Word * word = malloc(sizeof(Word));
+  word->s = calloc(strlen(s) + 1, sizeof(char)); // to contain null-byte
+  strcpy(word->s, s);
+  word->freq = freq;
+  return word;
+}
 
-  
-  char * word = calloc(20, sizeof(char));
-  char * oldword = calloc(20, sizeof(char));
-  int freq;
-  do {
-    strcpy(oldword, word);
-    scanf("%s %d", word, &freq);
-    feedWordBelow(root, TRIE_DEPTH, word, freq);
-    // PS: last line is being read twice, fix it.
+int inListOfWords(Word ** listOfWords, unsigned sz, char * s){
+  int i;
+  for(i = 0; i < sz; i++)
+    if(strcmp(listOfWords[i]->s, s) == 0)
+      return 1;
+  return 0;
+}
+
+int main(int argc, char ** argv){
+  char * s, * word, *oldword;
+  TrieNode * root;
+  unsigned i, freq, totalwords;
+  Word ** listOfWords;
+
+  root = addChild(NULL, 0x00);
+  totalwords = 0;
+
+  if(argc == 2 && strcmp(argv[1], "-d") == 0){
+    printf("Debug option activated.\n");
+    /*
+    do something special not yet implemented
+    */
   }
-  while(strcmp(oldword, word));
-  
- /*
-  feedWordBelow(root, TRIE_DEPTH, "avocado", 100);
-  feedWordBelow(root, TRIE_DEPTH, "adevogado", 100);
-  feedWordBelow(root, TRIE_DEPTH, "acabado", 100);
-  feedWordBelow(root, TRIE_DEPTH, "dinossauro", 300);
-  */
-  
+  else{
+    listOfWords = malloc(sizeof(Word *) * MAX_WORDS_READ);
+    word = calloc(WORD_BUFFER, sizeof(char));
+    oldword = calloc(MAX_WORD_LENGTH, sizeof(char));
+    strcpy(word, "");
+
+    while( totalwords < MAX_WORDS_READ ) {
+      strncpy(oldword, word, MAX_WORD_LENGTH);
+      scanf("%s %d", word, &freq);
+      if(strlen(word) > MAX_WORD_LENGTH)
+        continue;
+      if(strcmp(oldword, word) == 0)
+        break;
+      
+      // printf("%10d %s\n", totalwords, word);
+      
+      listOfWords[totalwords] = newWord(word, freq);
+      feedWordBelow(root, TRIE_DEPTH, listOfWords[totalwords++]);
+    }
+    free(word);
+    free(oldword);
+  }
+
+  s = calloc(MAX_WORD_LENGTH, sizeof(char));
+
   for(i = 0; i <= 10; i++)
     printf("Level %d, n_nodes = %d\n", i, countBelow(root, i));
 
@@ -291,13 +353,13 @@ int main(){
   printNode(root->children[0]->children[0]);
   // printNode(root->children[0]->children[1]->children[0]);
   
-  for(i = 0; i < 1000; ){
+  for(i = 0; i < 20; ){
     s = stringFromScratch(root);
-    if(strlen(s) > 3){
+    if(strlen(s) > 3 && !inListOfWords(listOfWords, totalwords, s)){
       i++;
       printf("<%s>\n", s);
     }
   }
-
+  free(s);
   return 0;
 }
