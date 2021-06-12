@@ -16,7 +16,13 @@
 #define TRIE_DEPTH 3
 #define SEPARATOR_CH   ' '
 #define SEPARATOR_STR  " "
-#define END_OF_WORD -1
+
+/* I will set control characters likely never to be used */
+/* https://stackoverflow.com/questions/15464262/is-there-any-character-that-is-never-used-in-ascii-or-unicode */
+/* https://en.wikipedia.org/wiki/Control_character */
+#define END_OF_WORD    0x01
+#define WORD_START     0x02
+#define NOT_WORD_START 0x03
 
 typedef struct trienode {
 
@@ -26,7 +32,6 @@ typedef struct trienode {
   struct trienode ** children;
   unsigned char depth;
   unsigned char nChildren;
-  int wordInitial;
 
 } TrieNode;
 
