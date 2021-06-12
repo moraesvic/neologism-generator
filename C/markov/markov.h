@@ -26,6 +26,7 @@ typedef struct trienode {
   struct trienode ** children;
   unsigned char depth;
   unsigned char nChildren;
+  int wordInitial;
 
 } TrieNode;
 

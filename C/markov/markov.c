@@ -5,6 +5,7 @@ TrieNode * addChild(TrieNode * parent, char ch){
   child->depth = (parent == NULL ? 0 : parent->depth + 1);
   child->freq = 1;
   child->freqChildren = 0;
+  child->wordInitial = 0;
   
   child->str = calloc(child->depth, sizeof(char));
   if(parent != NULL){
@@ -22,13 +23,7 @@ TrieNode * addChild(TrieNode * parent, char ch){
   return child;
 }
 
-int matchPrefix(TrieNode * node, char * s, unsigned offset){
-  int i;
-  for(i = 0; i < node->depth; i++)
-    if(s[offset + i] != node->str[i])
-      return 0;
-  return 1;
-}
+
 
 int inChildren(TrieNode * node, char ch){
   int i;
@@ -78,6 +73,14 @@ int matchBegin(TrieNode * node, char * word){
   return 1;
 }
 
+int matchPrefix(TrieNode * node, char * s, unsigned offset){
+  int i;
+  for(i = 0; i < node->depth; i++)
+    if(s[offset + i] != node->str[i])
+      return 0;
+  return 1;
+}
+
 void feedWordNode(TrieNode * node, char * word, unsigned freq){
   int i, childId;
   int sz = strlen(word);
@@ -100,44 +103,64 @@ void feedWordNode(TrieNode * node, char * word, unsigned freq){
       node->freqChildren += freq;
     }
   }
-  if(matchBegin(node, word)){
-    /* printf("--- MATCH BEGIN ---\n");
-    printNode(node);
-    printf("%s\n", word); */
-    childId = inChildren(node, word[node->depth]);
+  if(node->depth == 0){
+    // printf("--- MATCH BEGIN ---\n");
+    // printNode(node);
+    // printf("word: %s, suffix: %c\n", word, word[0]);
+    childId = inChildren(node, word[0]);
     if(childId == -1){
-      child = addChild(node, word[node->depth]);
+      child = addChild(node, word[0]);
+      child->wordInitial = 1;
       child->freq += freq - 1; // 1 will be already be added in addChild
       node->freqChildren += freq - 1; // same
     }
     else{
       node->children[childId]->freq += freq;
       node->freqChildren += freq;
+      node->children[childId]->wordInitial = 1;
     }
   }
   
-  for(i = 0; i + node->depth < sz; i++)
-    if(matchPrefix(node, word, i)){
-      childId = inChildren(node, word[i + node->depth]);
-      if(childId == -1){
-        child = addChild(node, word[i + node->depth]);
-        child->freq += freq - 1; // 1 will be already be added in addChild
-        node->freqChildren += freq - 1; // same
-      }
-      else{
-        node->children[childId]->freq += freq;
-        node->freqChildren += freq;
+    // printf("--- NOT MATCH BEGIN ---\n");
+    // printNode(node);
+    
+    for(i = 0 + (!node->depth); i + node->depth < sz; i++){
+      // printf("does <%s>, starting at position %d, ch %c, match the prefix?\n",
+      //       word, i, word[i]);
+      if(matchPrefix(node, word, i)){
+        // printf("ADDED word: %s, suffix: %c\n", word, word[i + node->depth]);
+        childId = inChildren(node, word[i + node->depth]);
+        if(childId == -1){
+          child = addChild(node, word[i + node->depth]);
+          child->freq += freq - 1; // 1 will be already be added in addChild
+          node->freqChildren += freq - 1; // same
+        }
+        else{
+          node->children[childId]->freq += freq;
+          node->freqChildren += freq;
+        }
       }
     }
+  
 }
 
 void printNode(TrieNode * node){
   int i;
-  printf("depth: %u, prefix <%s> nChildren: %u, freqChildren: %u\n",
-        node->depth, node->str, node->nChildren, node->freqChildren);
-  for(i = 0; i < node->nChildren; i++)
-    printf("child %3d: %s, freq: %3d\n", i, node->children[i]->str,
-        node->children[i]->freq);
+  char s[12];
+  if(node->wordInitial)
+    strcpy(s, "WORD_INIT");
+  else
+    strcpy(s, "");
+  printf("depth: %u, prefix <%s> nChildren: %u, freqChildren: %u %s\n",
+        node->depth, node->str, node->nChildren, node->freqChildren, s);
+  for(i = 0; i < node->nChildren; i++){
+    if(node->children[i]->wordInitial)
+      strcpy(s, "WORD_INIT");
+    else
+      strcpy(s, "");
+    printf("child %3d: %s, freq: %3d %s\n", i, node->children[i]->str,
+        node->children[i]->freq, s);
+  }
 }
 
 void populateBelow(TrieNode * node, unsigned char maxdepth,
@@ -263,8 +286,16 @@ char * stringFromScratch(TrieNode * root){
   char * nav = calloc(TRIE_DEPTH + 1, sizeof(char)); // to fit null-byte
   char * ptr = calloc(MAX_WORD_LENGTH, sizeof(char));
 
-  strcpy(ptr, "");
-  len = 0;
+  // printf("--- STARTING stringFromScratch ---\n");
+
+  do{
+    node = getRandomChild( root );
+    // printNode(node);
+  }
+  while(!node->wordInitial);
+
+  strcpy(ptr, node->str);
+  len = 1;
 
   while(len < MAX_WORD_LENGTH){
     // printf("len: %d\n", len);
@@ -350,10 +381,11 @@ int main(int argc, char ** argv){
   
   printNode(root);
   printNode(root->children[0]);
-  printNode(root->children[0]->children[0]);
+  printNode(root->children[1]);
+  printNode(root->children[1]->children[0]);
   // printNode(root->children[0]->children[1]->children[0]);
   
-  for(i = 0; i < 20; ){
+  for(i = 0; i < 100; ){
     s = stringFromScratch(root);
     if(strlen(s) > 3 && !inListOfWords(listOfWords, totalwords, s)){
       i++;
