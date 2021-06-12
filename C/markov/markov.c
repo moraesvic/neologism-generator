@@ -223,6 +223,10 @@ char * stringFromScratchBigText(TrieNode * root){
   return ptr;
 }
 
+void myStrCopy(char *a, char *b){
+	for(int i=0; (a[i] = b[i]) != 0; i++);
+}
+
 char * stringFromScratch(TrieNode * root){
   int len;
   TrieNode *node;
@@ -237,7 +241,7 @@ char * stringFromScratch(TrieNode * root){
     if(len > TRIE_DEPTH)
       strSlice(nav, ptr, len - TRIE_DEPTH, len);
     else
-      strcpy(nav,ptr);
+      myStrCopy(nav,ptr);
     
     //printf("ptr: <%s>\n", ptr);
     //printf("nav: <%s>\n", nav);
