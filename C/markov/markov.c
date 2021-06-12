@@ -5,8 +5,11 @@
 
 #define BIGGEST_INPUT 0xffff
 #define ALPHABET_LENGTH 100
+#define MAX_WORD_LENGTH 20
 
-const char separator = ' ';
+#define TRIE_DEPTH 3
+#define SEPARATOR_CH  ' '
+#define SEPARATOR_STR " "
 
 typedef struct trienode {
 
@@ -131,6 +134,59 @@ TrieNode * getRandomChild(TrieNode * node){
   return NULL;
 }
 
+void getRandomString(TrieNode * node, size_t length, char * ptr){
+  /* Starting at node node, it will write length chars
+     to pointer ptr. */
+  int i;
+  TrieNode * tempNode = node;
+  for(i = 0; i < length; i++){
+    tempNode = getRandomChild(tempNode);
+    if(tempNode != NULL)
+      ptr[i] = tempNode->str[tempNode->depth - 1];
+  }
+  ptr[i] = '\0';
+}
+
+void strSlice(char * buf, char * src, int start, int end){
+  int i;
+  for(i = 0; i < end-start; i++)
+    buf[i] = src[i+start];
+  buf[i] = '\0';
+}
+
+char * stringFromScratch(TrieNode * root){
+  int len, i;
+  TrieNode *node;
+  char * nav = calloc(TRIE_DEPTH + 1, sizeof(char)); // to fit null-byte
+  char * ptr = calloc(MAX_WORD_LENGTH + 1, sizeof(char));
+
+  strcpy(ptr, SEPARATOR_STR);
+  len = 1;
+
+  while(len < MAX_WORD_LENGTH){
+    // printf("len: %d\n", len);
+    if(len > TRIE_DEPTH)
+      strSlice(nav, ptr, len - TRIE_DEPTH, len);
+    else
+      strcpy(nav,ptr);
+    
+    // printf("ptr: <%s>\n", ptr);
+    // printf("nav: <%s>\n", nav);
+
+    node = navigateTrie(root, nav);
+    // printNode(node);
+    node = getRandomChild( node );
+    // printf("randomChild: <%s>\n", node->str);
+
+    if(node->str[node->depth - 1] == SEPARATOR_CH) break;
+    ptr[len++] = node->str[node->depth - 1];
+  }
+
+  for(i = 0; i < len; i++)
+    ptr[i] = ptr[i+1];
+  return ptr;
+}
+
 int main(){
   char * s = calloc(BIGGEST_INPUT, sizeof(char));
   unsigned i, sz;
@@ -138,18 +194,34 @@ int main(){
   for(i = 1; s[i-1] != 0 && i < BIGGEST_INPUT; i++)
     scanf("%c", s+i);
   sz = i-1;
-  // printf("%s\n", s);
 
   TrieNode * root = addChild(NULL, 0x00);
-  populateBelow(root, 4, s, sz);
+  populateBelow(root, TRIE_DEPTH, s, sz);
   for(i = 0; i <= 10; i++)
     printf("Level %d, n_nodes = %d\n", i, countBelow(root, i));
 
-  
+  /*
   printNode(root);
   printNode(root->children[0]);
   printNode(root->children[0]->children[0]);
+  printNode(root->children[0]->children[0]->children[0]);
+  printNode(root->children[0]->children[0]->children[0]->children[0]);
+  */
 
+  char ptr[MAX_WORD_LENGTH];
+  for(i = 0; i < 10; i++){
+    getRandomString( navigateTrie(root, " "), TRIE_DEPTH, ptr);
+    printf("%s\n", ptr);  
+  }
+
+  for(i = 0; i < 1000; i++){
+    s = stringFromScratch(root);
+    if(strlen(s) > 3){
+      i++;
+      printf("<%s>\n", s);
+    }
+  }
+  /*
   TrieNode * inspect = navigateTrie(root, "con");
   TrieNode * child;
   printNode(inspect);
@@ -157,4 +229,7 @@ int main(){
     child = getRandomChild(inspect);
     printf("%c ", child->str[child->depth - 1]);
   }
+  */
+
+  return 0;
 }
