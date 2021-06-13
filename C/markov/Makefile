@@ -10,3 +10,6 @@ perf: markov.c my_random.o
 
 my_random.o: my_random.c my_random.h
 	gcc -O3 -c my_random.c -o my_random.o
+
+clean:
+	rm markov.o my_random.o
