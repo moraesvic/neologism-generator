@@ -1,7 +1,8 @@
-avocado 2000
-adevogado 2000
-acabado 2000
-dinossauro 2000
+avocado 1000
+adevogado 1000
+acabado 1000
+dinossauro 1000
+dinossauro 1000
 faked 2641
 depart 2640
 monument 2640

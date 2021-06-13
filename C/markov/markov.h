@@ -24,42 +24,38 @@
 #define WORD_START     0x02
 #define NOT_WORD_START 0x03
 
+typedef unsigned char uchar;
+
 typedef struct trienode {
 
   unsigned freq;
   unsigned freqChildren;
-  char * str;
+  uchar ch;
   struct trienode ** children;
-  unsigned char depth;
-  unsigned char nChildren;
+  uchar depth;
+  uchar nChildren;
 
 } TrieNode;
 
 typedef struct {
-  char *s;
+  uchar *s;
   unsigned freq;
 } Word;
 
 /* */
 
 
-TrieNode * addChild(TrieNode * parent, char ch);
-int matchPrefix(TrieNode * node, char * s, unsigned offset);
-int inChildren(TrieNode * node, char ch);
-int matchEnd(TrieNode * node, char * word);
-void feedWordNode(TrieNode * node, char * word, unsigned freq);
-void printNode(TrieNode * node);
-void populateBelow(TrieNode * node, unsigned char maxdepth,
-      char * s, unsigned sz);
-void feedWordBelow(TrieNode * node, unsigned char maxdepth, Word * word);
-int countBelow(TrieNode * node, unsigned char maxdepth);
-TrieNode * findInNode(TrieNode * node, char ch);
-TrieNode * navigateTrie(TrieNode * root, char * str);
+int countBelow(TrieNode * node, uchar maxdepth);
+TrieNode * findInNode(TrieNode * node, uchar ch);
+TrieNode * navigateTrie(TrieNode * root, uchar * str);
+TrieNode * addChild(TrieNode * parent, uchar ch, unsigned freq);
+TrieNode * getChild(TrieNode * node, uchar ch);
+void feedWordTrie(TrieNode * root, uchar * word, unsigned freq);
+uchar * stringFromTrie(TrieNode * root);
 TrieNode * getRandomChild(TrieNode * node);
-void getRandomString(TrieNode * node, size_t length, char * ptr);
 void strSlice(char * buf, char * src, int start, int end);
-char * stringFromScratchBigText(TrieNode * root);
-char * stringFromScratch(TrieNode * root);
-int main();
+Word  * newWord(uchar * s, unsigned freq);
+int inListOfWords(Word ** listOfWords, unsigned sz, uchar * s);
+int main(int argc, char ** argv);
 
 #endif /* MARKOV_H */

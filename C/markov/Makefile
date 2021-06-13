@@ -6,7 +6,7 @@ make: markov.c my_random.o
 	gcc -g -O0 markov.o my_random.o -o markov
 
 perf: markov.c my_random.o
-	gcc $(FLAGS_PROD) my_random.o markov.c -o perf
+	gcc $(FLAGS_PROD) -Wno-pointer-sign my_random.o markov.c -o perf
 
 my_random.o: my_random.c my_random.h
-	gcc -g -O0 -c my_random.c -o my_random.o
+	gcc -O3 -c my_random.c -o my_random.o
