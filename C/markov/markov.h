@@ -16,7 +16,8 @@
 #define MAX_WORDS_READ 50000
 #define MIN_OUTPUT_STR 5
 
-#define TRIE_DEPTH 3
+// #define TRIE_DEPTH 3
+extern unsigned TRIE_DEPTH;
 
 /* I will set control characters likely never to be used */
 /* https://stackoverflow.com/questions/15464262/is-there-any-character-that-is-never-used-in-ascii-or-unicode */

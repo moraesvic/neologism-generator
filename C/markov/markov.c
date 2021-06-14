@@ -1,5 +1,7 @@
 #include "markov.h"
 
+unsigned TRIE_DEPTH;
+
 int countBelow(TrieNode * node, uchar maxdepth){
   int i, sum = 0;
   if(node->depth == maxdepth) return 1;
@@ -328,12 +330,8 @@ TrieNode * readTrie(char * path){
      * higher or lower than the last entry in stack.
      *  */
 
-    //printf("entry %d of %d\n", entries, entriesInFile);
-    //printStack(st);
     parent = stackLast(st);
     child = readEntry(fp);
-    //printNode(parent);
-    //printNode(child);
     if(child->depth <= parent->depth){
       while(child->depth <= parent->depth)
         parent = triePop(st);
@@ -357,16 +355,29 @@ int strInArgv(int argc, char ** argv, char * str){
   int i;
   for(i = 1; i < argc; i++)
     if(strcmp(argv[i], str) == 0)
-      return 1;
+      return i;
   return 0;
 }
 
 int main(int argc, char ** argv){
   uchar * s, * newstr, *oldstr;
   TrieNode * root;
-  unsigned i, freq, totalwords;
+  unsigned i, freq, totalwords, index;
   Word * word;
   Word ** listOfWords;
+
+  /* depth sent by command line */
+  if(strInArgv(argc, argv, "-d")){
+    index = strInArgv(argc, argv, "-d");
+    if(index + 1 < argc)
+      TRIE_DEPTH = atoi(argv[index+1]);
+    else
+      TRIE_DEPTH = 3;
+  }
+  else
+    TRIE_DEPTH = 3;
+
+  printf("Using TRIE_DEPTH of %d\n", TRIE_DEPTH);
 
   if(strInArgv(argc, argv, "-r")){
     printf("Now entering reading mode.\n");
@@ -402,33 +413,6 @@ int main(int argc, char ** argv){
     free(newstr);
     free(oldstr);
   }
-
-  #ifdef DEBUG
-    printf("Debug option activated.\n");
-
-    for(i = 0; i <= 10; i++)
-      printf("Level %d, n_nodes = %d\n", i, countBelow(root, i));
-
-    for(i = 0; i < totalwords; i++)
-      printf("%10d %s freq=%d\n", i, listOfWords[i]->s, listOfWords[i]->freq);
-  
-    printNode(root);
-    printNode(root->children[0]);
-    printNode(root->children[1]);
-    printf("--- WORD_START ---\n");
-    printNode(root->children[0]->children[0]);
-    printNode(root->children[0]->children[0]->children[0]);
-    printNode(root->children[0]->children[0]->children[0]->children[0]);
-    printNode(root->children[0]->children[0]->children[0]->children[0]->children[0]);
-    printf("--- NOT_WORD_START ---\n");
-    printNode(root->children[1]->children[0]);
-    printNode(root->children[1]->children[1]);
-    printNode(root->children[1]->children[2]);
-    printNode(root->children[1]->children[4]->children[0]);
-  
-    return 0;
-
-  #endif
   
   if(strInArgv(argc, argv, "-w")){
     printf("Saving trie to file.\n");
