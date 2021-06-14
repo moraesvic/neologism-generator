@@ -6,16 +6,17 @@
 #include <string.h>
 #include "my_random.h"
 
+/* Uncomment to turn on debug options */
+// #define DEBUG 
 
 #define BIGGEST_INPUT 0xffff
-#define ALPHABET_LENGTH 100
-#define MAX_WORD_LENGTH 20
+#define ALPHABET_LENGTH 256
+#define MAX_WORD_LENGTH 50
 #define WORD_BUFFER 100
 #define MAX_WORDS_READ 50000
+#define MIN_OUTPUT_STR 5
 
 #define TRIE_DEPTH 3
-#define SEPARATOR_CH   ' '
-#define SEPARATOR_STR  " "
 
 /* I will set control characters likely never to be used */
 /* https://stackoverflow.com/questions/15464262/is-there-any-character-that-is-never-used-in-ascii-or-unicode */
@@ -23,6 +24,11 @@
 #define END_OF_WORD    0x01
 #define WORD_START     0x02
 #define NOT_WORD_START 0x03
+
+#define NO_ERROR                0x00
+#define READ_ENTRY_ERROR        0x01
+#define SIZE_NOT_MULTIPLE_ERROR 0x02
+#define FILE_IO_ERROR           0x03
 
 typedef unsigned char uchar;
 
