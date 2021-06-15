@@ -1,0 +1,36 @@
+https://stackoverflow.com/questions/44978546/is-it-possible-to-use-gcc-to-compile-one-section-of-a-code-file-with-specific-co
+
+// Using #pragma
+#pragma GCC push_options
+#pragma GCC optimize ("-O3")
+
+
+void fast_function_pragma()
+{
+    printf("This will be another fast routine.\n");
+}
+
+
+#pragma GCC pop_options
+
+
+#pragma GCC push_options
+#pragma GCC optimize ("-O1")
+
+
+void slow_function_pragma()
+{
+    printf("This will be another slow routine.\n");
+}
+
+
+#pragma GCC pop_options
+
+
+int main(void)
+{
+    fast_function_attribute();
+    slow_function_attribute();
+    fast_function_pragma();
+    slow_function_pragma();
+}

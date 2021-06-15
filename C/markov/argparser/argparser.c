@@ -61,10 +61,15 @@ unsigned strtouint(char * str, int base){
 }
 
 int main(int argc, char ** argv){
+  
   unsigned uint;
   long li;
   int i;
   char read[100];
+
+  #ifdef MYMACRO
+  printf("hi, this is macro!!!\n");
+  #endif
   printf("sizeof(int) = %ld\nsizeof(long) = %ld\n", sizeof(int), sizeof(long));
   printf("INT_MIN: %d, INT_MAX: %d\n", INT_MIN, INT_MAX);
   printf("UINT_MAX: %u\n", UINT_MAX);

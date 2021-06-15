@@ -1,0 +1,38 @@
+How to compile sections of code only if a flag is enabled:
+The section of code should be guarded by conditionals such as #ifdef, #if etc.
+
+https://gcc.gnu.org/onlinedocs/gcc-3.0/cpp_4.html
+
+Then, invoke GCC with flag -D:
+
+https://gcc.gnu.org/onlinedocs/cpp/Invocation.html
+
+-D name
+    Predefine "name" as a macro, with definition 1.
+
+-D name=definition
+    The contents of definition are tokenized and processed, then applied to "name".
+
+Practical example (1)
+
+    #ifdef DEBUG_SECTION_1
+
+    printf("This is included only for debugging purposes.\n");
+
+    #endif
+
+Then compile with
+
+    gcc -D DEBUG_SECTION_1 file.c
+
+Practical example (2)
+
+    #if (DEBUG_LEVEL > 1)
+
+    printf("This is included only if DEBUG_LEVEL is 2 or higher.\n");
+
+    #endif
+
+Then compile with
+
+    gcc -D DEBUG_LEVEL=2 file.c
