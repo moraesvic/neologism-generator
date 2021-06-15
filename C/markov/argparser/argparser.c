@@ -40,7 +40,7 @@ int strtoi(char * str, int base){
     fprintf(stderr, "(strtoi) Failed to convert str to int.\n");
     fprintf(stderr, "Result (%ld) is too large or too small for int.\n", li);
     fprintf(stderr, "%d <= INT <= %d\n", INT_MIN, INT_MAX);
-    exit(STRTOL_ERROR);
+    exit(STRTOI_ERROR);
   }
   i = li;
   return i;
@@ -66,18 +66,15 @@ int main(int argc, char ** argv){
   long li;
   int i;
   char read[100];
-
-  #ifdef MYMACRO
-  printf("hi, this is macro!!!\n");
-  #endif
-  printf("sizeof(int) = %ld\nsizeof(long) = %ld\n", sizeof(int), sizeof(long));
-  printf("INT_MIN: %d, INT_MAX: %d\n", INT_MIN, INT_MAX);
-  printf("UINT_MAX: %u\n", UINT_MAX);
-  printf("LONG_MIN: %ld, LONG_MAX: %ld\n", LONG_MIN, LONG_MAX);
+  
+  DEBUGPRINT("sizeof(int) = %ld\nsizeof(long) = %ld\n", sizeof(int), sizeof(long));
+  DEBUGPRINT("INT_MIN: %d, INT_MAX: %d\n", INT_MIN, INT_MAX);
+  DEBUGPRINT("UINT_MAX: %u\n", UINT_MAX);
+  DEBUGPRINT("LONG_MIN: %ld, LONG_MAX: %ld\n", LONG_MIN, LONG_MAX);
   scanf("%s", read);
   
-  // i    = strtoi(read, 10);
-  // uint = strtouint(read, 10);
+  i    = strtoi(read, 10);
+  uint = strtouint(read, 10);
   li   = mystrtol(read, 10);
   printf("%d %u %ld\n", i, uint, li);
 

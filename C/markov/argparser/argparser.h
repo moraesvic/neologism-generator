@@ -5,11 +5,17 @@
 #include <stdio.h>  // for IO
 #include <limits.h> // for downgrading long to int
 
-#define STRTOL_ERROR    0x0101
-#define STRTOI_ERROR    0x0102
-#define STRTOUINT_ERROR 0x0103
+/* https://www.gnu.org/software/libc/manual/html_node/Argp.html */
+#include <getopt.h>
 
 
+#include "macros.h"
 
+enum ERROR_TYPE{
+  OK = 0,
+  STRTOL_ERROR,
+  STRTOI_ERROR,
+  STRTOUINT_ERROR
+};
 
 #endif /* ARGPARSER_H */
