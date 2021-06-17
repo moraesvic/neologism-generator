@@ -1,11 +1,6 @@
 #include "markov.h"
 
-/*
-extern unsigned trie_depth;
-extern int verbose, output, input;
-extern char *filename;
-extern unsigned n_generate;
-*/
+#include "macros.h"
 
 int countBelow(TrieNode * node, uchar maxdepth){
   int i, sum = 0;
@@ -197,18 +192,6 @@ int inListOfWords(Word ** listOfWords, unsigned sz, uchar * s){
   return 0;
 }
 
-void saveTrieDebug(TrieNode * node){
-  /* each entry will hold only: ch, freq, depth*/
-  int i;
-  if(node == NULL)
-    return;
-
-  printf("depth %u <%c - 0x%x> freq %u\n",
-        node->depth, node->ch, node->ch, node->freq);
-  for(i = 0; i < node->nChildren; i++) 
-    saveTrieDebug(node->children[i]);
-}
-
 void saveTrie2(TrieNode * node, FILE * fp){
   /* each entry will hold only: ch, freq, depth*/
   int i;
@@ -233,14 +216,27 @@ void saveTrie(TrieNode * node, char * path){
 }
 
 typedef struct trienodestack {
-  TrieNode *el[10]; // element
+  TrieNode **el; // element
   uchar sz;
 } TrieNodeStack;
 
 TrieNodeStack * newTrieNodeStack(){
-  TrieNodeStack * st = malloc(sizeof(TrieNodeStack));
-  st->sz = 0;
-  return st;
+    int i;
+    TrieNodeStack * st = malloc(sizeof(TrieNodeStack));
+    /* we need to sum 3 here, to leave space for root, 
+     * word_start vs. non_word_start, and then the leaves */
+    st->el = malloc(sizeof(TrieNode *) * (trie_depth + 3));
+    // for(i = 0; i < trie_depth + 2; i++)
+    //     st->el[i] = malloc(sizeof(TrieNode *));
+    st->sz = 0;
+    return st;
+}
+
+void free_stack(TrieNodeStack * st)
+{
+    int i;
+    free(st->el);
+    free(st);
 }
 
 void triePush(TrieNodeStack * st, TrieNode * el){
@@ -277,7 +273,7 @@ void printStack(TrieNodeStack * st){
 
 TrieNode * readEntry(FILE * fp){
   TrieNode * child = malloc(sizeof(TrieNode));
-  child = malloc(sizeof(TrieNode));
+  //child = malloc(sizeof(TrieNode));
  
   if( !(
             fread(&child->ch,        sizeof(uchar),    1, fp)
@@ -337,10 +333,24 @@ TrieNode * readTrie(char * path){
 
     parent = stackLast(st);
     child = readEntry(fp);
+    
+/*
+    printf("reading entry %d\n", entries);
+    printStack(st);
+    printNode(parent);
+    printNode(child);
+    */
+
+    
+
+
     if(child->depth <= parent->depth){
-      while(child->depth <= parent->depth)
+      while(child->depth <= parent->depth){
         parent = triePop(st);
+        //printf("pop!\n");
+      }
       triePush(st, parent);
+      
     }
 
     
@@ -352,8 +362,18 @@ TrieNode * readTrie(char * path){
 
   }
   fclose(fp);
-  free(st);
+  free_stack(st);
   return root;
+}
+
+void freeTrie(TrieNode * root)
+{
+    TrieNode * node = root;
+    int i;
+    for (i = 0; i < node->nChildren; i++)
+        freeTrie(node->children[i]);
+    free(node->children);
+    free(root);
 }
 
 int main(int argc, char ** argv){
@@ -361,7 +381,7 @@ int main(int argc, char ** argv){
     TrieNode * root;
     unsigned i, freq, totalwords;
     Word * word;
-    Word ** listOfWords;
+    Word ** listOfWords = NULL;
 
     FILE *stream;
     char filenamenew[2048];
@@ -410,6 +430,11 @@ int main(int argc, char ** argv){
             fclose(stream);
     }
 
+    /* trie is already built */
+    if (verbose)
+        for (i = 0; i < 10; i++)
+            printf("at depth %2d are %d nodes\n", i, countBelow(root, i));
+
     if (output){
         if (verbose)
             printf("Saving trie to %s.\n", filename);
@@ -439,5 +464,13 @@ int main(int argc, char ** argv){
         }
     }
 
+    for (i = 0; i < totalwords; i++){
+        free(listOfWords[i]->s);
+        free(listOfWords[i]);
+    }
+
+    if(listOfWords != NULL)
+        free(listOfWords);
+    freeTrie(root);
     return 0;
 }
