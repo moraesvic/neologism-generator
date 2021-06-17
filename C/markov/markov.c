@@ -356,14 +356,6 @@ TrieNode * readTrie(char * path){
   return root;
 }
 
-int strInArgv(int argc, char ** argv, char * str){
-  int i;
-  for(i = 1; i < argc; i++)
-    if(strcmp(argv[i], str) == 0)
-      return i;
-  return 0;
-}
-
 int main(int argc, char ** argv){
     uchar * s, * newstr, *oldstr;
     TrieNode * root;
@@ -371,11 +363,14 @@ int main(int argc, char ** argv){
     Word * word;
     Word ** listOfWords;
 
+    FILE *stream;
+    char filenamenew[2048];
+
     parse_args(argc, argv);
 
     if (input){
         if (verbose)
-                printf("Now entering reading mode.\n");
+                printf("Reading trie-file %s.\n", filename);
         root = readTrie(filename);
         totalwords = 0;
     } else {
@@ -388,9 +383,14 @@ int main(int argc, char ** argv){
         oldstr = calloc(MAX_WORD_LENGTH, sizeof(uchar));
         strcpy(newstr, "");
 
+        if (create_trie)
+            stream = fopen(filename, "r");
+        else
+            stream = stdin;
+
         while( totalwords < MAX_WORDS_READ ) {
             strncpy(oldstr, newstr, MAX_WORD_LENGTH);
-            scanf("%s %d", newstr, &freq);
+            fscanf(stream, "%s %d", newstr, &freq);
             if(strlen(newstr) > MAX_WORD_LENGTH)
             continue;
             if(strcmp(newstr, oldstr) == 0)
@@ -405,12 +405,24 @@ int main(int argc, char ** argv){
 
         free(newstr);
         free(oldstr);
+
+        if (create_trie)
+            fclose(stream);
     }
 
     if (output){
         if (verbose)
-            printf("Saving trie to file.\n");
+            printf("Saving trie to %s.\n", filename);
         saveTrie(root, filename);
+    } else if (create_trie) {
+        sprintf(filenamenew, "%s_depth=%02d_.bin", filename, trie_depth);
+        if (verbose)
+            printf("Saving trie to %s.\n", filenamenew);
+
+        /* to do: save also the wordlist read from file, so
+         * words generated are always new words */
+        
+        saveTrie(root, filenamenew);
     }
 
     if (n_generate){

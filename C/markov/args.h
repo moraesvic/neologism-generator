@@ -12,12 +12,12 @@
 
 extern unsigned trie_depth;
 extern unsigned n_generate;
-extern int verbose, output, input;
+extern int verbose, output, input, create_trie;
 extern char *filename;
 
 struct arguments {
   unsigned trie_depth, n_generate;
-  int verbose, output, input;
+  int verbose, output, input, create_trie;
   char *filename;
 };
 
