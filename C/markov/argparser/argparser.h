@@ -6,16 +6,20 @@
 #include <limits.h> // for downgrading long to int
 
 /* https://www.gnu.org/software/libc/manual/html_node/Argp.html */
-#include <getopt.h>
+#include <argp.h>
 
 
 #include "macros.h"
 
+enum OK_STATUS{
+  OK_STATUS = 0
+};
+
 enum ERROR_TYPE{
-  OK = 0,
-  STRTOL_ERROR,
+  STRTOL_ERROR = 1,
   STRTOI_ERROR,
-  STRTOUINT_ERROR
+  STRTOUINT_ERROR,
+  CONTRADICTORY_ARGS_ERROR
 };
 
 #endif /* ARGPARSER_H */
