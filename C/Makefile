@@ -3,15 +3,16 @@ FLAGS_PROF=-Wall -O3 -pg
 FLAGS_PROD=-Wall -O3
 
 OBJ=markov.c my_random.o my_string.o args.o
+BIN_DIR=../bin/
 
 make: $(OBJ)
-	gcc $(FLAGS_DEV)  -Wno-pointer-sign $(OBJ) -o markov
+	gcc $(FLAGS_DEV)  -Wno-pointer-sign $(OBJ) -o $(BIN_DIR)markov
 
 prof: $(OBJ)
-	gcc $(FLAGS_PROF) -Wno-pointer-sign $(OBJ) -o prof
+	gcc $(FLAGS_PROF) -Wno-pointer-sign $(OBJ) -o $(BIN_DIR)prof
 
 perf: $(OBJ)
-	gcc $(FLAGS_PROD) -Wno-pointer-sign $(OBJ) -o perf
+	gcc $(FLAGS_PROD) -Wno-pointer-sign $(OBJ) -o $(BIN_DIR)perf
 
 # -----
 
@@ -27,9 +28,10 @@ my_string.o: my_string.c my_string.h
 # -----
 
 all: $(OBJ)
-	gcc $(FLAGS_DEV)  -Wno-pointer-sign $(OBJ) -o markov
-	gcc $(FLAGS_PROF) -Wno-pointer-sign $(OBJ) -o prof
-	gcc $(FLAGS_PROD) -Wno-pointer-sign $(OBJ) -o perf
+	gcc $(FLAGS_DEV)  -Wno-pointer-sign $(OBJ) -o $(BIN_DIR)markov
+	gcc $(FLAGS_PROF) -Wno-pointer-sign $(OBJ) -o $(BIN_DIR)prof
+	gcc $(FLAGS_PROD) -Wno-pointer-sign $(OBJ) -o $(BIN_DIR)perf
+	rm *.o
 
 clean:
 	rm *.o *.bin *.out
