@@ -1,19 +1,25 @@
-FLAGS_DEV=-Wall -g -O0
+FLAGS_DEV=-Wall -g -O0 -D DEBUG_FLAG
+FLAGS_PROF=-Wall -O3 -pg
 FLAGS_PROD=-Wall -O3
 
-make: markov.c markov.h my_random.o
-	gcc $(FLAGS_DEV)  -Wno-pointer-sign markov.c my_random.o -o markov
+OBJ=markov.c my_random.o my_string.o args.c
 
-prof: markov.c markov.h my_random.o
-	gcc $(FLAGS_PROD) -pg -Wno-pointer-sign my_random.o markov.c -o prof
+make: $(OBJ)
+	gcc $(FLAGS_DEV)  -Wno-pointer-sign $(OBJ) -o markov
 
-perf: markov.c markov.h my_random.o
-	gcc $(FLAGS_PROD) -Wno-pointer-sign my_random.o markov.c -o perf
+prof: $(OBJ)
+	gcc $(FLAGS_PROF) -Wno-pointer-sign $(OBJ) -o prof
+
+perf: $(OBJ)
+	gcc $(FLAGS_PROD) -Wno-pointer-sign $(OBJ) -o perf
 
 # -----
 
 my_random.o: my_random.c my_random.h
 	gcc $(FLAGS_PROD) -c my_random.c -o my_random.o
+
+my_string.o: my_string.c my_string.h
+	gcc $(FLAGS_PROD) -c my_string.c -o my_string.o
 
 # -----
 
@@ -23,4 +29,4 @@ all:
 	gcc $(FLAGS_PROD) -Wno-pointer-sign my_random.o markov.c -o perf
 
 clean:
-	rm my_random.o
+	rm my_random.o my_string.o

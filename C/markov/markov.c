@@ -1,6 +1,11 @@
 #include "markov.h"
 
-unsigned TRIE_DEPTH;
+/*
+extern unsigned trie_depth;
+extern int verbose, output, input;
+extern char *filename;
+extern unsigned n_generate;
+*/
 
 int countBelow(TrieNode * node, uchar maxdepth){
   int i, sum = 0;
@@ -96,7 +101,7 @@ void feedWordTrie(TrieNode * root, uchar * word, unsigned freq){
   
   node = addChild(rootWordStart, word[0], freq);
   /* in word start */
-  for(len = 1; len <= TRIE_DEPTH; len++){
+  for(len = 1; len <= trie_depth; len++){
     if(len == sz){
       addChild(node, END_OF_WORD, freq);
       break;
@@ -107,7 +112,7 @@ void feedWordTrie(TrieNode * root, uchar * word, unsigned freq){
   /* not in word start */
   for(i = 0; i < sz; i++){
     node = addChild(rootNotWordStart, word[i], freq);
-    for(len = 1; len <= TRIE_DEPTH; len++){
+    for(len = 1; len <= trie_depth; len++){
       if(i + len == sz){
         addChild(node, END_OF_WORD, freq);
         break;
@@ -126,7 +131,7 @@ uchar * stringFromTrie(TrieNode * root){
   rootNotWordStart = getChild(root, NOT_WORD_START);
 
   node = rootWordStart;
-  for(i = 0; i < TRIE_DEPTH; i++){
+  for(i = 0; i < trie_depth; i++){
     node = getRandomChild(node);
     ch = node->ch;
     if(ch == END_OF_WORD)
@@ -134,9 +139,9 @@ uchar * stringFromTrie(TrieNode * root){
     str[i] = ch;
   }
 
-  for(i = TRIE_DEPTH; i < MAX_WORD_LENGTH; i++){
+  for(i = trie_depth; i < MAX_WORD_LENGTH; i++){
     node = rootNotWordStart;
-    for(j = -TRIE_DEPTH; j < 0; j++)
+    for(j = -trie_depth; j < 0; j++)
       node = getChild(node, str[i + j]);
 
     ch = getRandomChild(node)->ch;
@@ -360,78 +365,67 @@ int strInArgv(int argc, char ** argv, char * str){
 }
 
 int main(int argc, char ** argv){
-  uchar * s, * newstr, *oldstr;
-  TrieNode * root;
-  unsigned i, freq, totalwords, index;
-  Word * word;
-  Word ** listOfWords;
+    uchar * s, * newstr, *oldstr;
+    TrieNode * root;
+    unsigned i, freq, totalwords;
+    Word * word;
+    Word ** listOfWords;
 
-  /* depth sent by command line */
-  if(strInArgv(argc, argv, "-d")){
-    index = strInArgv(argc, argv, "-d");
-    if(index + 1 < argc)
-      TRIE_DEPTH = atoi(argv[index+1]);
-    else
-      TRIE_DEPTH = 3;
-  }
-  else
-    TRIE_DEPTH = 3;
+    parse_args(argc, argv);
 
-  printf("Using TRIE_DEPTH of %d\n", TRIE_DEPTH);
+    if (input){
+        if (verbose)
+                printf("Now entering reading mode.\n");
+        root = readTrie(filename);
+        totalwords = 0;
+    } else {
+        root = addChild(NULL, 0x00,    1);
+        addChild(root, WORD_START,     1);
+        addChild(root, NOT_WORD_START, 1);
+        totalwords = 0;
+        listOfWords = malloc(sizeof(Word *) * MAX_WORDS_READ);
+        newstr = calloc(WORD_BUFFER, sizeof(uchar));
+        oldstr = calloc(MAX_WORD_LENGTH, sizeof(uchar));
+        strcpy(newstr, "");
 
-  if(strInArgv(argc, argv, "-r")){
-    printf("Now entering reading mode.\n");
-    root = readTrie("trie.bin");
-    totalwords = 0;
-  }
-  else {
+        while( totalwords < MAX_WORDS_READ ) {
+            strncpy(oldstr, newstr, MAX_WORD_LENGTH);
+            scanf("%s %d", newstr, &freq);
+            if(strlen(newstr) > MAX_WORD_LENGTH)
+            continue;
+            if(strcmp(newstr, oldstr) == 0)
+            break;
+            
+            word = newWord(newstr, freq);
+            
+            
+            listOfWords[totalwords++] = word;
+            feedWordTrie(root, word->s, word->freq);
+        }
 
-    root = addChild(NULL, 0x00,    1);
-    addChild(root, WORD_START,     1);
-    addChild(root, NOT_WORD_START, 1);
-    totalwords = 0;
-    listOfWords = malloc(sizeof(Word *) * MAX_WORDS_READ);
-    newstr = calloc(WORD_BUFFER, sizeof(uchar));
-    oldstr = calloc(MAX_WORD_LENGTH, sizeof(uchar));
-    strcpy(newstr, "");
-
-    while( totalwords < MAX_WORDS_READ ) {
-      strncpy(oldstr, newstr, MAX_WORD_LENGTH);
-      scanf("%s %d", newstr, &freq);
-      if(strlen(newstr) > MAX_WORD_LENGTH)
-        continue;
-      if(strcmp(newstr, oldstr) == 0)
-        break;
-      
-      word = newWord(newstr, freq);
-      
-      
-      listOfWords[totalwords++] = word;
-      feedWordTrie(root, word->s, word->freq);
+        free(newstr);
+        free(oldstr);
     }
-    
-    free(newstr);
-    free(oldstr);
-  }
-  
-  if(strInArgv(argc, argv, "-w")){
-    printf("Saving trie to file.\n");
-    saveTrie(root, "trie.bin");
-  }
 
-  if(strInArgv(argc, argv, "-g")){
-    printf("generating list of random words\n");
-    for(i = 0; i < 100; ){
-      s = stringFromTrie(root);
-      if(strlen(s) >= MIN_OUTPUT_STR
-        && inListOfWords(listOfWords, totalwords, s) == 0 )
-      {
-        i++;
-        printf("<%s>\n", s);
-      }
-      free(s);
+    if (output){
+        if (verbose)
+            printf("Saving trie to file.\n");
+        saveTrie(root, filename);
     }
-  }
-  
-  return 0;
+
+    if (n_generate){
+        if (verbose)
+            printf("generating list of random words\n");
+        for (i = 0; i < n_generate; ){
+            s = stringFromTrie(root);
+            if (strlen(s) >= MIN_OUTPUT_STR
+            && inListOfWords(listOfWords, totalwords, s) == 0 ) {
+                i++;
+                printf("<%s>\n", s);
+            }
+            free(s);
+        }
+    }
+
+    return 0;
 }
