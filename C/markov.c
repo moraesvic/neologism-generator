@@ -211,6 +211,7 @@ void saveTrie(TrieNode * node, char * path){
     fprintf(stderr, "(saveTrie) Could not open file to write.\n");
     exit(FILE_IO_ERROR);
   }
+  fwrite(&trie_depth, sizeof(uchar), 1, fp);
   saveTrie2(node, fp);
   fclose(fp);
 }
@@ -221,20 +222,16 @@ typedef struct trienodestack {
 } TrieNodeStack;
 
 TrieNodeStack * newTrieNodeStack(){
-    int i;
     TrieNodeStack * st = malloc(sizeof(TrieNodeStack));
     /* we need to sum 3 here, to leave space for root, 
      * word_start vs. non_word_start, and then the leaves */
     st->el = malloc(sizeof(TrieNode *) * (trie_depth + 3));
-    // for(i = 0; i < trie_depth + 2; i++)
-    //     st->el[i] = malloc(sizeof(TrieNode *));
     st->sz = 0;
     return st;
 }
 
 void free_stack(TrieNodeStack * st)
 {
-    int i;
     free(st->el);
     free(st);
 }
@@ -312,12 +309,16 @@ TrieNode * readTrie(char * path){
   }
   fseek(fp, 0, SEEK_END);
   const unsigned filesz = ftell(fp);
-  if(filesz % entrysz != 0){
+  /* remember we are leaving 1 initial byte for trie_depth */
+  if((filesz - 1) % entrysz != 0){
     fprintf(stderr, "(readTrie): File size is not a multiple of entry size.\n");
     exit(SIZE_NOT_MULTIPLE_ERROR);
   }
   rewind(fp);
-  const unsigned entriesInFile = filesz / entrysz;
+  const unsigned entriesInFile = (filesz - 1) / entrysz;
+
+  if (!fread(&trie_depth, sizeof(uchar), 1, fp))
+    fprintf(stderr, "Could not get trie_depth!\n");
 
   st = newTrieNodeStack();
   /* starting with root node */
