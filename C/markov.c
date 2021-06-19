@@ -377,6 +377,157 @@ void freeTrie(TrieNode * root)
     free(root);
 }
 
+enum ERR_GENWORDS {
+    OK = 0,
+    ERR_FILE_OPEN,
+    ERR_WORD_TOO_LONG,
+    ERR_FREQ_NOT_POSITIVE,
+    ERR_WORDLIST_EMPTY,
+    ERR_TIMEOUT
+};
+
+TrieNode * new_trie(){
+    TrieNode * root;
+    root = addChild(NULL, 0x00,    1);
+    addChild(root, WORD_START,     1);
+    addChild(root, NOT_WORD_START, 1);
+    return root;
+}
+
+void str_from_trie_noalloc(TrieNode * root, uchar * str)
+{
+    uchar ch;
+    int i, j;
+    TrieNode * node, *rootWordStart, *rootNotWordStart;
+    rootWordStart = getChild(root, WORD_START);
+    rootNotWordStart = getChild(root, NOT_WORD_START);
+    strcpy(str, "");
+
+    node = rootWordStart;
+    for(i = 0; i < trie_depth; i++){
+        node = getRandomChild(node);
+        ch = node->ch;
+        if(ch == END_OF_WORD) {
+            str[i] = '\0';
+            return;
+        }
+        str[i] = ch;
+    }
+
+    for(i = trie_depth; i < MAX_WORD_LENGTH; i++){
+        node = rootNotWordStart;
+        for(j = -trie_depth; j < 0; j++)
+            node = getChild(node, str[i + j]);
+        ch = getRandomChild(node)->ch;
+        if(ch == END_OF_WORD) {
+            str[i] = '\0';
+            return;
+        }
+        str[i] = ch;
+    }
+    str[i] = '\0';
+}
+
+void trie_info(TrieNode * root)
+{
+    int i;
+    for (i = 0; i < 10; i++)
+        printf("at depth %2d are %d nodes\n", i, countBelow(root, i));
+}
+
+int gen_words(char * filename, unsigned trdep,
+unsigned n, unsigned minsz, char * answer,
+double timeout){
+    /* This is an API to be used by NodeJS */
+    uchar *str, *buf;
+    TrieNode * root;
+    int ret;
+    unsigned i, freq, totalwords;
+    Word * word;
+    Word ** wordlist = NULL;
+    FILE * fp;
+    double maxtime = timeout / 1000.0;
+    clock_t start_t = clock();
+
+    fp = fopen(filename, "r");
+    if(!fp)
+        return ERR_FILE_OPEN;
+
+    root = new_trie();
+    trie_depth = trdep;
+    wordlist = malloc(sizeof(Word *) * (MAX_WORDS_READ + n));
+    str = calloc(WORD_BUFFER, sizeof(uchar));
+
+    totalwords = 0;
+    ret = fscanf(fp, "%s %d", str, &freq);
+
+    while (totalwords < MAX_WORDS_READ && ret == 2
+    && (double)(clock() - start_t) / CLOCKS_PER_SEC < maxtime) {
+        if (strlen(str) > MAX_WORD_LENGTH)
+            return ERR_WORD_TOO_LONG;
+        if (freq <= 0)
+            return ERR_FREQ_NOT_POSITIVE;
+        word = newWord(str, freq);
+        wordlist[totalwords++] = word;
+        feedWordTrie(root, word->s, word->freq);
+        ret = fscanf(fp, "%s %d", str, &freq);
+    }
+
+    fclose(fp);
+    if((double)(clock() - start_t) / CLOCKS_PER_SEC > maxtime) {
+        printf("%f\n", maxtime);
+        printf("%f\n", (double)(clock() - start_t) / CLOCKS_PER_SEC);
+        return ERR_TIMEOUT;
+    }
+    if(totalwords == 0)
+        return ERR_WORDLIST_EMPTY;
+
+    time_seed();
+    buf = calloc(WORD_BUFFER, sizeof(uchar));
+    strcpy(answer, "");
+    for(i = 0; i < n
+    && (double)(clock() - start_t) / CLOCKS_PER_SEC < maxtime; /* */){
+        str_from_trie_noalloc(root, str);
+        if (strlen(str) >= minsz
+        && inListOfWords(wordlist, totalwords, str) == 0 ) {
+            wordlist[totalwords++] = newWord(str, 1);
+            sprintf(buf, "%s\n", str);
+            strcat(answer, buf);
+            i++;
+        }
+    }
+
+    if((double)(clock() - start_t) / CLOCKS_PER_SEC > maxtime) {
+        printf("%f\n", maxtime);
+        printf("%f\n", (double)(clock() - start_t) / CLOCKS_PER_SEC);
+        return ERR_TIMEOUT;
+    }
+    
+    /* cleanup */
+    for (i = 0; i < totalwords; i++){
+        free(wordlist[i]->s);
+        free(wordlist[i]);
+    }
+    printf("%f\n", maxtime);
+    printf("%f\n", (double)(clock() - start_t) / CLOCKS_PER_SEC);
+    free(wordlist);
+    freeTrie(root);
+    free(str);
+    free(buf);
+    return OK;
+}
+
+#ifdef NO_MAIN
+
+int main(int argc, char ** argv){
+    char * str = calloc(10000, sizeof(char));
+    gen_words("../data/en_50k.txt", 3, 10, 5, str, 1000.0);
+    return 0;
+
+}
+
+#else
+
 int main(int argc, char ** argv){
     uchar * s, * newstr, *oldstr;
     TrieNode * root;
@@ -475,3 +626,5 @@ int main(int argc, char ** argv){
     freeTrie(root);
     return 0;
 }
+
+#endif
