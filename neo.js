@@ -14,44 +14,6 @@ const EventEmitter = require('events');
 SegfaultHandler.registerHandler("crash.log");
 
 const MAX_WORDS_IN_ANSWER = 1000;
-const MAX_WAIT = 1;// 10; //2000;
-
-async function wrap(fn, args){
-    /* https://ckeditor.com/blog/Aborting-a-signal-how-to-cancel-an-asynchronous-task-in-JavaScript/ */
-    return new Promise( (resolve, reject) => { 
-        const timeout = setTimeout(() => {
-            console.log('timeout!');
-            reject(1);
-            // signal.emit('done');
-            // ret.expired = true;
-        }, MAX_WAIT);
-
-        let ret = fn(...args);
-        clearTimeout(timeout);
-        resolve(ret);
-
-    });
-
-    let ret =
-    {
-        expired: false,
-        out: null,
-    };
-
-    const signal = new EventEmitter();
-
-    
-
-    fn.async(...args, function(err, res){ 
-        console.log('processed in time');
-        clearTimeout(timeout);
-        ret.out = res;
-        signal.emit('done');
-    });
-
-    await Events.once(signal, 'done');
-    return ret;
-}
 
 async function main(){
     const argv = Minim(process.argv.slice(2));
@@ -66,7 +28,7 @@ async function main(){
     let freqlist = argv.db || 'en_50k.txt';
     let trieDepth = argv.depth || 3;
     let minWordLen = argv.len || 3;
-    let timeout = 2000;
+    let timeout = 1000;
 
     if (nWords > MAX_WORDS_IN_ANSWER) {
         console.log("That's too many words.");
@@ -75,7 +37,7 @@ async function main(){
 
     const charPtr = ref.refType('char');
     const cLib = ffi.Library(C_BINARY, {gen_words: 
-             ['int', [charPtr, 'int', 'int', 'int', charPtr, 'double']]});
+             ['int', [charPtr, 'int', 'int', 'int', charPtr, 'int']]});
 
     const filename = Buffer.alloc(1000);
     filename.write(DATA + freqlist, 'ascii')

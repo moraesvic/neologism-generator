@@ -437,21 +437,25 @@ void trie_info(TrieNode * root)
 
 int gen_words(char * filename, unsigned trdep,
 unsigned n, unsigned minsz, char * answer,
-double timeout){
+unsigned timeout){
     /* This is an API to be used by NodeJS */
     uchar *str, *buf;
     TrieNode * root;
-    int ret;
+    int varsread, ret;
     unsigned i, freq, totalwords;
     Word * word;
-    Word ** wordlist = NULL;
+    Word ** wordlist;
     FILE * fp;
-    double maxtime = timeout / 1000.0;
-    clock_t start_t = clock();
+    unsigned long maxclocks;
+    clock_t start_t;
 
+    maxclocks = (double)timeout / 1000.0 * CLOCKS_PER_SEC;
+    start_t = clock();
     fp = fopen(filename, "r");
-    if(!fp)
-        return ERR_FILE_OPEN;
+    if (!fp) {
+        ret = ERR_FILE_OPEN;
+        goto err_file_open;
+    }
 
     root = new_trie();
     trie_depth = trdep;
@@ -459,34 +463,41 @@ double timeout){
     str = calloc(WORD_BUFFER, sizeof(uchar));
 
     totalwords = 0;
-    ret = fscanf(fp, "%s %d", str, &freq);
+    varsread = fscanf(fp, "%s %d", str, &freq);
 
-    while (totalwords < MAX_WORDS_READ && ret == 2
-    && (double)(clock() - start_t) / CLOCKS_PER_SEC < maxtime) {
-        if (strlen(str) > MAX_WORD_LENGTH)
-            return ERR_WORD_TOO_LONG;
-        if (freq <= 0)
-            return ERR_FREQ_NOT_POSITIVE;
+    while (totalwords < MAX_WORDS_READ && varsread == 2) {
+        if (clock() - start_t > maxclocks) {
+            ret = ERR_TIMEOUT;
+            goto err_file_read;
+        }
+        if (strlen(str) > MAX_WORD_LENGTH) {
+            ret = ERR_WORD_TOO_LONG;
+            goto err_file_read;
+        }
+        if (freq <= 0) {
+            ret = ERR_FREQ_NOT_POSITIVE;
+            goto err_file_read;
+        }
         word = newWord(str, freq);
         wordlist[totalwords++] = word;
         feedWordTrie(root, word->s, word->freq);
-        ret = fscanf(fp, "%s %d", str, &freq);
+        varsread = fscanf(fp, "%s %d", str, &freq);
     }
 
-    fclose(fp);
-    if((double)(clock() - start_t) / CLOCKS_PER_SEC > maxtime) {
-        printf("%f\n", maxtime);
-        printf("%f\n", (double)(clock() - start_t) / CLOCKS_PER_SEC);
-        return ERR_TIMEOUT;
+    
+    if(totalwords == 0) {
+        ret = ERR_WORDLIST_EMPTY;
+        goto err_file_read;
     }
-    if(totalwords == 0)
-        return ERR_WORDLIST_EMPTY;
 
     time_seed();
     buf = calloc(WORD_BUFFER, sizeof(uchar));
     strcpy(answer, "");
-    for(i = 0; i < n
-    && (double)(clock() - start_t) / CLOCKS_PER_SEC < maxtime; /* */){
+    for(i = 0; i < n; /* */) {
+        if (clock() - start_t > maxclocks) {
+            ret = ERR_TIMEOUT;
+            goto err_produce_output;
+        }
         str_from_trie_noalloc(root, str);
         if (strlen(str) >= minsz
         && inListOfWords(wordlist, totalwords, str) == 0 ) {
@@ -496,32 +507,37 @@ double timeout){
             i++;
         }
     }
-
-    if((double)(clock() - start_t) / CLOCKS_PER_SEC > maxtime) {
-        printf("%f\n", maxtime);
-        printf("%f\n", (double)(clock() - start_t) / CLOCKS_PER_SEC);
-        return ERR_TIMEOUT;
-    }
-    
-    /* cleanup */
+    /* congratulations, if you got here it is because no error happened */
+    ret = OK;
+    /* cleanup */    
+err_produce_output:
+    free(buf);
+err_file_read:
+    fclose(fp);
+    free(str);
+    freeTrie(root);
     for (i = 0; i < totalwords; i++){
         free(wordlist[i]->s);
         free(wordlist[i]);
     }
-    printf("%f\n", maxtime);
-    printf("%f\n", (double)(clock() - start_t) / CLOCKS_PER_SEC);
     free(wordlist);
-    freeTrie(root);
-    free(str);
-    free(buf);
-    return OK;
+err_file_open:
+#ifdef DEBUG_FLAG
+    printf("running at %lu clocks per sec\n", CLOCKS_PER_SEC);
+    printf("%lu clocks allowed\n", maxclocks);
+    printf("%lu clocks elapsed\n", clock() - start_t);
+#endif
+    return ret;
 }
 
 #ifdef NO_MAIN
 
 int main(int argc, char ** argv){
     char * str = calloc(10000, sizeof(char));
-    gen_words("../data/en_50k.txt", 3, 10, 5, str, 1000.0);
+    int ret;
+    ret = gen_words("../data/en_50k.txt", 3, 10, 5, str, 100);
+    printf("returned %d\n", ret);
+    free(str);
     return 0;
 
 }
