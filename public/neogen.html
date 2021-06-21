@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+        <form id='neogenform'>
+            <table>
+            <tr>
+                <td>
+                    <label for='nWords'>Number of words</label>
+                </td>
+                <td>
+                    <input type='number' name='nWords' id='nWords'
+                    min="1" max="100" required>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for='lang'>Language</label>
+                </td>
+                <td>
+                    <select name='lang' id='lang' required>
+                        <option disabled selected value="none"> -- select an option -- </option>
+                        <option value="ar">AR - Arabic</option>
+                        <option value="de">DE - German</option>
+                        <option value="en">EN - English</option>
+                        <option value="el">EL - Greek</option>
+                        <option value="eo">EO - Esperanto</option>
+                        <option value="es">ES - Spanish</option>
+                        <option value="fr">FR - French</option>
+                        <option value="he">HE - Hebrew</option>
+                        <option value="hrsr_cy">SH - Serbo-Croatian (Cyrillic)</option>
+                        <option value="hrsr_la">SH - Serbo-Croatian (Latin)</option>
+                        <option value="it">IT - Italian</option>
+                        <option value="nl">NL - Dutch</option>
+                        <option value="no">NO - Norwegian</option>
+                        <option value="pl">PL - Polish</option>
+                        <option value="pt_br">PT - Portuguese (BR)</option>
+                        <option value="pt_pt">PT - Portuguese (PT)</option>
+                        <option value="ro">RO - Romanian</option>
+                        <option value="ru">RU - Russian</option>
+                        <option value="sq">SQ - Albanian</option>
+                        <option value="uk">UK - Ukrainian</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for='trieDepth'>Trie Depth</label>
+                </td>
+                <td>
+                    <input type="range" min="1" max="10" value="5"
+                    class="slider" name="trieDepth" id="trieDepth">
+                    <span id="slidervalue">5</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for='minWordLen'>Minimum length of word</label>
+                </td>
+                <td>
+                    <input type='number' name='minWordLen' id='minWordLen'
+                    min="0" max="10" required>
+                </td>
+            </tr>
+            </table>
+            <button type='submit'>Send!</button><br>
+        </form>
+        <p id='answer'></p>
+        <script src='/static/js/xhr.js'></script>
+        <script>
+function formToJSONStr(form){
+    const sz = form.children.length;
+    let dict = {};
+    for(let i = 0; i < sz; i++)
+        formToJSONStr2(form.children[i], dict);
+    return JSON.stringify(dict);
+}
+
+function formToJSONStr2(el, dict){
+    const validTags = ["INPUT", "SELECT", "TEXTAREA", "DATALIST", "OUTPUT"];
+    if (validTags.includes(el.tagName) && el.id)
+        dict[el.name] = el.value;
+    
+    const sz = el.children.length;
+    for(let i = 0; i < sz; i++)
+        formToJSONStr2(el.children[i], dict);
+}
+
+function formToJSONNative(form){
+    const fd = new FormData(form);
+    let dict = {};
+    for(let [key, value] of fd.entries())
+        dict[key] = value;
+    return JSON.stringify(dict);
+}
+
+const slider = document.getElementById("trieDepth");
+const slidervalue = document.getElementById("slidervalue");
+slider.oninput = () => { slidervalue.innerHTML = slider.value; };
+let waiting = false;
+
+
+document.getElementById('neogenform').onsubmit = async function(e){
+    e.preventDefault();
+    if (waiting)
+        return;
+    const answer = document.getElementById('answer');
+    if (document.getElementById('lang').value === "none") {
+        alert("Please select one language.");
+        return;
+    }
+    answer.innerHTML = "loading ...";
+
+    console.log(formToJSONStr(this));
+
+    waiting = true;
+    fetch('/neogen', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: formToJSONStr(this)
+    })
+    .then(response => response.json())
+    .then(data => {
+        data.text = data.text.replace(/\n/g,'<br>');
+        answer.innerHTML = data.text;
+        waiting = false;
+    });
+}
+        </script>
+    </body>
+</html>
