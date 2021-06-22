@@ -19,7 +19,7 @@ app.get('/', function(req, res){
 });
 
 app.get('/neogen', function(req, res) {
-    res.sendFile(PUBLIC + 'neogen.html');
+    res.render('neogen.ejs', {});
 });
 
 app.post('/neogen', async function(req,res) {

@@ -5,9 +5,8 @@ const Path = require('path');
 const C_BINARY = Path.join(__dirname, 'bin/neogen.so');
 const DATA     = Path.join(__dirname, 'data/');
 
-const ref = require("ref");
-const ffi = require("ffi");
-const { ok } = require('assert');
+const ref = require("ref-napi");
+const ffi = require("ffi-napi");
 
 /* When things go awry... use this */
 /*
@@ -106,7 +105,7 @@ const myFunction = async function neogen(nWords, lang, trieDepth, minWordLen){
     /* If everything is fine ... do the work! */
     
     /* Maximum time shared library has */
-    const timeout = 2500;
+    const timeout = 4000;
     const charPtr = ref.refType('char');
     const cLib = ffi.Library(C_BINARY, {gen_words: 
              ['int', [charPtr, 'int', 'int', 'int', charPtr, 'int']]});
@@ -114,12 +113,11 @@ const myFunction = async function neogen(nWords, lang, trieDepth, minWordLen){
     const filenameBuf = Buffer.alloc(1000);
     filenameBuf.write(filename, 'ascii')
 
-    const buf = Buffer.alloc(MAX_WORDS_IN_ANSWER * 100);
+    let buf = Buffer.alloc(MAX_WORDS_IN_ANSWER * 100);
     const args = [filenameBuf, trieDepth, nWords, minWordLen, buf, timeout];
     /* later transform the following into async (use .async 
         with callback and other adaptations )*/
     const err = cLib.gen_words(...args);
-    // console.log(buf.toString());
     
     if (!err) {
         ret.body = buf.toString().replace(/\0/g, '');

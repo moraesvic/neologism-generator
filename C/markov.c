@@ -535,7 +535,7 @@ err_file_open:
 int main(int argc, char ** argv){
     char * str = calloc(10000, sizeof(char));
     int ret;
-    ret = gen_words("../data/en_50k.txt", 3, 10, 5, str, 100);
+    ret = gen_words("../data/en.txt", 3, 10, 5, str, 2500);
     printf("returned %d\n", ret);
     free(str);
     return 0;
