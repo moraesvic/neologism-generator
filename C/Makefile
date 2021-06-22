@@ -3,7 +3,7 @@ FLAGS_PROF=-Wall -O3 -pg
 FLAGS_PROD=-Wall -O3
 FLAGS_DYNLIB=-shared -fpic -D NO_MAIN
 
-SRC=markov.c my_random.o my_string.o args.o
+SRC=markov.c my_random.o my_string.o
 BIN_DIR=../bin/
 
 make: $(SRC)
@@ -15,31 +15,25 @@ prof: $(SRC)
 perf: $(SRC)
 	gcc $(FLAGS_PROD) -Wno-pointer-sign $(SRC) -o $(BIN_DIR)perf
 
-qshared: args.c my_random.c my_string.c markov.c
-	gcc $(FLAGS_DEV) -D NO_MAIN -c args.c -o args.o
+qshared: my_random.c my_string.c markov.c
 	gcc $(FLAGS_DEV) -D NO_MAIN -c my_random.c -o my_random.o
 	gcc $(FLAGS_DEV) -D NO_MAIN -c my_string.c -o my_string.o
 	gcc $(FLAGS_DEV) -D NO_MAIN -Wno-pointer-sign $(SRC) -o $(BIN_DIR)neogen
 	rm args.o my_random.o my_string.o
 
-shared: args.c my_random.c my_string.c markov.c
-	gcc $(FLAGS_PROD) $(FLAGS_DYNLIB) -c args.c -o args.o
+shared: my_random.c my_string.c markov.c
 	gcc $(FLAGS_PROD) $(FLAGS_DYNLIB) -c my_random.c -o my_random.o
 	gcc $(FLAGS_PROD) $(FLAGS_DYNLIB) -c my_string.c -o my_string.o
 	gcc $(FLAGS_PROD) $(FLAGS_DYNLIB) -Wno-pointer-sign $(SRC) -o $(BIN_DIR)neogen.so
 	rm args.o my_random.o my_string.o
 
-shared_debug: args.c my_random.c my_string.c markov.c
-	gcc $(FLAGS_DEV) $(FLAGS_DYNLIB) -c args.c -o args.o
+shared_debug: my_random.c my_string.c markov.c
 	gcc $(FLAGS_DEV) $(FLAGS_DYNLIB) -c my_random.c -o my_random.o
 	gcc $(FLAGS_DEV) $(FLAGS_DYNLIB) -c my_string.c -o my_string.o
 	gcc $(FLAGS_DEV) $(FLAGS_DYNLIB) -Wno-pointer-sign $(SRC) -o $(BIN_DIR)neogen.so
 	rm args.o my_random.o my_string.o
 
 # -----
-
-args.o: args.c args.h
-	gcc $(FLAGS_PROD) -c args.c -o args.o
 
 my_random.o: my_random.c my_random.h
 	gcc $(FLAGS_PROD) -c my_random.c -o my_random.o

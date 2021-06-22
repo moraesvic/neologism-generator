@@ -146,9 +146,12 @@ async function neogen_C(ret, filename, trieDepth,
 nWords, minWordLen, timeout)
 {
     let out = await TeenPr.exec(`${C_BIN}`,
-            [ filename, trieDepth, nWords, minWordLen, timeout ]);
-    console.log(out);
-    ret.body = out.stdout;
+    [ filename, trieDepth, nWords, minWordLen, timeout ]);
+    if (out.stderr === '')
+        ret.body = out.stdout;
+    else
+        ret.body = out.stderr;
+    
     return ret;
 }
 
