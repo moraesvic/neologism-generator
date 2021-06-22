@@ -2,11 +2,13 @@
 
 const Path = require('path');
 
-const C_BINARY = Path.join(__dirname, 'bin/neogen.so');
+const C_SHRLIB = Path.join(__dirname, 'bin/neogen.so');
+const C_BIN    = Path.join(__dirname, 'bin/perf');
 const DATA     = Path.join(__dirname, 'data/');
 
 const ref = require("ref-napi");
 const ffi = require("ffi-napi");
+const TeenPr = require("teen_process");
 
 /* When things go awry... use this */
 /*
@@ -55,6 +57,8 @@ C ERRORS HERE
 const ERR_VALIDATE = 6;
 
 const myFunction = async function neogen(nWords, lang, trieDepth, minWordLen){
+    /* This is for use with the FFI library. However, it has a bug which 
+     * leaks memory and a replacement is necessary */
     const ret =
     {
         status: OK,
@@ -102,13 +106,22 @@ const myFunction = async function neogen(nWords, lang, trieDepth, minWordLen){
         minWordLen = Math.floor(minWordLen * NON_ASCII_FACTOR);
     }
 
-    /* If everything is fine ... do the work! */
-    
     /* Maximum time shared library has */
     const timeout = 4000;
+    /* If everything is fine ... do the work! */
+    // return neogen_shrlib(ret, filename, trieDepth,
+    // nWords, minWordLen, timeout);
+    return neogen_C(ret, filename, trieDepth,
+    nWords, minWordLen, timeout);
+    
+};
+
+async function neogen_shrlib(ret, filename, trieDepth,
+nWords, minWordLen, timeout)
+{
     const charPtr = ref.refType('char');
-    const cLib = ffi.Library(C_BINARY, {gen_words: 
-             ['int', [charPtr, 'int', 'int', 'int', charPtr, 'int']]});
+    const cLib = ffi.Library(C_SHRLIB, {gen_words: 
+            ['int', [charPtr, 'int', 'int', 'int', charPtr, 'int']]});
 
     const filenameBuf = Buffer.alloc(1000);
     filenameBuf.write(filename, 'ascii')
@@ -118,7 +131,7 @@ const myFunction = async function neogen(nWords, lang, trieDepth, minWordLen){
     /* later transform the following into async (use .async 
         with callback and other adaptations )*/
     const err = cLib.gen_words(...args);
-    
+
     if (!err) {
         ret.body = buf.toString().replace(/\0/g, '');
         return ret;
@@ -127,6 +140,16 @@ const myFunction = async function neogen(nWords, lang, trieDepth, minWordLen){
         ret.status = err;
         return ret;    
     };
-};
+}
+
+async function neogen_C(ret, filename, trieDepth,
+nWords, minWordLen, timeout)
+{
+    let out = await TeenPr.exec(`${C_BIN}`,
+            [ filename, trieDepth, nWords, minWordLen, timeout ]);
+    console.log(out);
+    ret.body = out.stdout;
+    return ret;
+}
 
 module.exports = myFunction;
