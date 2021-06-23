@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="">
     </head>
     <body>
+        <h1>Neologism generator</h1>
         <form id='neogenform'>
             <table>
             <tr>
@@ -73,6 +74,27 @@
             <button type='submit'>Send!</button><br>
         </form>
         <p id='answer'></p>
+        <h2>What is this???</h2>
+        <p>
+            This is a neologism generator. A <a href='https://en.wikipedia.org/wiki/Neologism'>neologism</a> is a freshly coined word. Although some creativity is involved in the creation of new words, as we properly credit the geniuses of Shakespeare, Joyce and Guimarães Rosa, neologisms follow phonological and morphological patterns which can be replicated by a mechanical process.
+        </p>
+        <p>
+            Starting from frequency words from natural languages, obtained from <a href='https://invokeit.wordpress.com/frequency-word-lists/'>this blog</a> referred by Wikipedia, we produce new words, that follow their patterns as a <a href='https://en.wikipedia.org/wiki/Markov_chain'>Markov (anamnesic) process</a>.
+        </p>
+        <p>
+            For example, the i<sup>th</sup> letter in a word depends solely one the last N letters defined by the parameter "Trie-Depth". If you use a too low "Trie-Depth", you will end up with almost random words, as the next letter only depends on the last one or two. When the parameter goes up, we get words that look somewhat funny, but could eventually be found in the language, even if as a pun. With a high Trie-Depth, the words are probably proper words of the language, but were not in the original list because they were too specific (too many derivational affixes and so on).
+        </p>
+
+        <p>
+            The backend was implemented with C, with my own implementation of the Trie data structure. This makes it quite fast to process frequency lists. Most of the work is actually done trying to find a word which follows the given Markov process, but is not in the original list. Anyway, even in the worst reasonable scenarios, the server usually responds with only 100 MB RAM usage and 4 seconds delay.
+
+            The web-backend is implemented with NodeJS, with the library teen_process to call C code as an external process.
+        </p>
+        <p>
+            <a href="https://github.com/moraesvic/neologism-generator">Check the project source at GitHub!</a>
+        </p>
+
+
         <script src='/static/js/xhr.js'></script>
         <script>
 
@@ -92,8 +114,6 @@ document.getElementById('neogenform').onsubmit = async function(e){
         return;
     }
     answer.innerHTML = "loading ...";
-
-    console.log(formToJSONStr(this));
 
     waiting = true;
     fetch('/neogen', {
