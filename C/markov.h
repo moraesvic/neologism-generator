@@ -59,6 +59,11 @@ typedef struct trienodestack {
         uchar sz, maxsz;
 } TrieNodeStack;
 
+struct error_message {
+    int code;
+    char * msg;
+};
+
 /* */
 uchar trie_depth;
 
@@ -96,9 +101,10 @@ void printStack(TrieNodeStack * st);
 int gen_words_teenprocess(char * filename, unsigned trdep,
 unsigned n, unsigned minsz, unsigned timeout);
 /* */
+int read_text_file(char * filename, Word ** wordlist,
+unsigned * totalwords, TrieNode * root, int feedwordtrie);
+int is_triefile_adequate(char * triefilename, unsigned trdep);
 int main(int argc, char ** argv);
-
-
 /* --- */
 
 

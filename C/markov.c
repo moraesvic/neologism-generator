@@ -341,18 +341,80 @@ void printStack(TrieNodeStack * st){
   printf("<-- END OF PRINTING STACK -->\n");
 }
 /* ----- */
+int read_text_file(char * filename, Word ** wordlist,
+unsigned * totalwords, TrieNode * root, int feedwordtrie)
+{
+    int varsread, ret;
+    unsigned freq;
+    uchar * str;
+    char fmt[32];
+    FILE * fp;
+    Word * word;
+
+    str = calloc(WORD_BUFFER, sizeof(uchar)); 
+    fp = fopen(filename, "r");
+    if (!fp) {
+        ret = ERR_FILE_OPEN;
+        goto err_cleanup;
+    }
+    /* this will protect us against buffer overflow */
+    sprintf(fmt, "%%%ds %%d", WORD_BUFFER - 1);
+    varsread = fscanf(fp, fmt, str, &freq);
+    
+    while (*totalwords < MAX_WORDS_READ && varsread == 2) {
+        if (strlen(str) > MAX_WORD_LENGTH) {
+            ret = ERR_WORD_TOO_LONG;
+            goto err_cleanup;
+        }
+        if (freq <= 0) {
+            ret = ERR_FREQ_NOT_POSITIVE;
+            goto err_cleanup;
+        }
+        word = newWord(str, freq);
+        wordlist[(*totalwords)++] = word;
+        if (feedwordtrie)
+            feedWordTrie(root, word->s, word->freq);
+        varsread = fscanf(fp, "%s %d", str, &freq);
+    }
+    if(*totalwords == 0) {
+        ret = ERR_WORDLIST_EMPTY;
+        goto err_cleanup;
+    }
+    ret = OK;
+err_cleanup:
+    free(str);
+    fclose(fp);
+    return ret;
+}
+
+int is_triefile_adequate(char * triefilename, unsigned trdep)
+{
+    FILE * fp;
+    uchar tmpch;
+    if (access(triefilename, R_OK) == 0) {
+        fp = fopen(triefilename, "rb");
+        if (!fread(&tmpch, sizeof(uchar), 1, fp)) {
+            fclose(fp);
+            return 0;
+        }
+        fclose(fp);
+        if (tmpch >= trdep)
+            return 1;
+    }
+    return 0;
+}
+
 int gen_words_teenprocess(char * filename, unsigned trdep,
-unsigned n, unsigned minsz, unsigned timeout){
+unsigned n, unsigned minsz, unsigned timeout)
+{
     /* This is an API to be used by NodeJS-TeenProcess */
     /* With it, we hope to fix the memory leakage */
-    uchar tmp, *str;
+    uchar *str;
     char triefilename[1024];
     TrieNode * root;
-    int varsread, ret;
-    unsigned i, freq, totalwords;
-    Word * word;
+    int ret, tmp;
+    unsigned i, totalwords;
     Word ** wordlist;
-    FILE * fp;
     unsigned long maxclocks;
     clock_t start_t;
     
@@ -360,74 +422,23 @@ unsigned n, unsigned minsz, unsigned timeout){
     sprintf(triefilename, "%s.trie", filename);
 
     /* check if trie file exists and whether it is deep enough for the request */
-    root = NULL;
+    wordlist = malloc(sizeof(Word *) * (MAX_WORDS_READ + n));
     totalwords = 0;
-    if (access(triefilename, R_OK) == 0) {
-        fp = fopen(triefilename, "rb");
-        if (!fread(&tmp, sizeof(uchar), 1, fp)) {
-            fclose(fp);
-            ret = ERR_FILE_OPEN;
-            goto err_file_open;
+    if (is_triefile_adequate(triefilename, trdep)) {
+        root = readTrie(triefilename, trdep);
+        tmp = read_text_file(filename, wordlist, &totalwords, root, 0);
+        if (tmp != OK) {
+            ret = tmp;
+            goto err_read_text_file;
         }
-        fclose(fp);
-        if (tmp >= trdep) {
-            root = readTrie(triefilename, trdep);
-            fp = fopen(filename, "r");
-            if (!fp) {
-                ret = ERR_FILE_OPEN;
-                goto err_file_open;
-            }
-            wordlist = malloc(sizeof(Word *) * (MAX_WORDS_READ + n));
-            str = calloc(WORD_BUFFER, sizeof(uchar)); 
-            varsread = fscanf(fp, "%s %d", str, &freq);
-            /* later we need to refactor this */
-            while (totalwords < MAX_WORDS_READ && varsread == 2) {
-                if (strlen(str) > MAX_WORD_LENGTH) {
-                    ret = ERR_WORD_TOO_LONG;
-                    goto err_file_read;
-                }
-                if (freq <= 0) {
-                    ret = ERR_FREQ_NOT_POSITIVE;
-                    goto err_file_read;
-                }
-                word = newWord(str, freq);
-                wordlist[totalwords++] = word;
-                varsread = fscanf(fp, "%s %d", str, &freq);
-            }
-        }
-    }
-
-    /* if no root was defined yet... let's build the trie from our text file */
-    if (root == NULL) {
-        fp = fopen(filename, "r");
-        if (!fp) {
-            ret = ERR_FILE_OPEN;
-            goto err_file_open;
-        }
+    } else {
         root = new_trie();
         trie_depth = trdep;
-        wordlist = malloc(sizeof(Word *) * (MAX_WORDS_READ + n));
-        str = calloc(WORD_BUFFER, sizeof(uchar));  
-        varsread = fscanf(fp, "%s %d", str, &freq);
-
-        while (totalwords < MAX_WORDS_READ && varsread == 2) {
-            if (strlen(str) > MAX_WORD_LENGTH) {
-                ret = ERR_WORD_TOO_LONG;
-                goto err_file_read;
-            }
-            if (freq <= 0) {
-                ret = ERR_FREQ_NOT_POSITIVE;
-                goto err_file_read;
-            }
-            word = newWord(str, freq);
-            wordlist[totalwords++] = word;
-            feedWordTrie(root, word->s, word->freq);
-            varsread = fscanf(fp, "%s %d", str, &freq);
-        }        
-        if(totalwords == 0) {
-            ret = ERR_WORDLIST_EMPTY;
-            goto err_file_read;
-        }
+        tmp = read_text_file(filename, wordlist, &totalwords, root, 1);
+        if (tmp != OK) {
+            ret = tmp;
+            goto err_read_text_file;
+        } 
         saveTrie(root, triefilename);
     }
 
@@ -437,9 +448,11 @@ unsigned n, unsigned minsz, unsigned timeout){
 
     /* let's reset trie_depth, in case we loaded from binary file and the
      * depth was deeper than desired for generating strings */
+    /* this is kind of a hack and i don't like it, but i need to fix later */
     
     trie_depth = trdep;
     time_seed();
+    str = calloc(MAX_WORD_LENGTH + 1, sizeof(uchar)); 
     for(i = 0; i < n; /* */) {
         if (clock() - start_t > maxclocks) {
             ret = ERR_TIMEOUT;
@@ -457,23 +470,45 @@ unsigned n, unsigned minsz, unsigned timeout){
     ret = OK;
     /* cleanup */    
 err_produce_output:
-    /* nothing else would happen here */
-err_file_read:
-    fclose(fp);
     free(str);
-    freeTrie(root);
+err_read_text_file:
     for (i = 0; i < totalwords; i++){
         free(wordlist[i]->s);
         free(wordlist[i]);
     }
     free(wordlist);
-err_file_open:
+    freeTrie(root);
 #ifdef DEBUG_FLAG
     printf("running at %lu clocks per sec\n", CLOCKS_PER_SEC);
     printf("%lu clocks allowed\n", maxclocks);
     printf("%lu clocks elapsed\n", clock() - start_t);
 #endif
     return ret;
+}
+
+void print_error(int err)
+{
+    int i;
+    struct error_message errmsg[] = 
+    {
+    {OK, "No errors"},
+    {ERR_FILE_OPEN, "Error opening file"},
+    {ERR_SIZE_NOT_MULTIPLE, "Trie-file size has unexpected value"},
+    {ERR_READ_ENTRY, "Error reading entry from trie-file"},
+    {ERR_WORD_TOO_LONG, "Error: word too long"},
+    {ERR_FREQ_NOT_POSITIVE, "Error: frequency list contains negative value"},
+    {ERR_WORDLIST_EMPTY, "Error: wordlist generated from textfile is empty"},
+    {ERR_TIMEOUT, "Error: timeout"},
+    {ERR_STACKOVERFLOW, "Error: stack overflow"}
+    };
+    if (err == OK)
+        return;
+    for (i = 0; i < sizeof errmsg; i++)
+        if (errmsg[i].code == err) {
+            fprintf(stderr, "%s\n", errmsg[i].msg);
+            return;
+        }
+    fprintf(stderr, "Error: could not decode error message.\n");
 }
 
 int main(int argc, char **argv){
@@ -483,7 +518,6 @@ int main(int argc, char **argv){
     unsigned minsz   = strtouint(argv[4], 10);
     unsigned timeout = strtouint(argv[5], 10);
     int ret = gen_words_teenprocess(filename, trdep, n, minsz, timeout);
-    if (ret)
-        fprintf(stderr,"error code %d\n", ret);
+    print_error(ret);
     return 0;
 }
