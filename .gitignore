@@ -105,3 +105,9 @@ dist
 
 # Python cache
 py/__pycache__/
+
+# trie-files
+*.trie
+
+# binary files - just make them yourself!
+bin/*
