@@ -57,8 +57,6 @@ C ERRORS HERE
 const ERR_VALIDATE = 6;
 
 const myFunction = async function neogen(nWords, lang, trieDepth, minWordLen){
-    /* This is for use with the FFI library. However, it has a bug which 
-     * leaks memory and a replacement is necessary */
     const ret =
     {
         status: OK,
@@ -80,7 +78,7 @@ const myFunction = async function neogen(nWords, lang, trieDepth, minWordLen){
         ret.status = ERR_VALIDATE;
         return ret;
     }
-    // console.log(`${nWords}, ${lang}, ${trieDepth}, ${minWordLen}`);
+    
     if (!(lang in languageDecode)) {
         console.log("Invalid language");
         ret.status = ERR_VALIDATE;
@@ -109,8 +107,6 @@ const myFunction = async function neogen(nWords, lang, trieDepth, minWordLen){
     /* Maximum time shared library has */
     const timeout = 4000;
     /* If everything is fine ... do the work! */
-    // return neogen_shrlib(ret, filename, trieDepth,
-    // nWords, minWordLen, timeout);
     return neogen_C(ret, filename, trieDepth,
     nWords, minWordLen, timeout);
     
@@ -119,6 +115,8 @@ const myFunction = async function neogen(nWords, lang, trieDepth, minWordLen){
 async function neogen_shrlib(ret, filename, trieDepth,
 nWords, minWordLen, timeout)
 {
+    /* This is now deprecated. It would be easier to do everything through ffi,
+     * but unfortunately the thing leaks memory. */
     const charPtr = ref.refType('char');
     const cLib = ffi.Library(C_SHRLIB, {gen_words: 
             ['int', [charPtr, 'int', 'int', 'int', charPtr, 'int']]});
@@ -128,8 +126,7 @@ nWords, minWordLen, timeout)
 
     let buf = Buffer.alloc(MAX_WORDS_IN_ANSWER * 100);
     const args = [filenameBuf, trieDepth, nWords, minWordLen, buf, timeout];
-    /* later transform the following into async (use .async 
-        with callback and other adaptations )*/
+
     const err = cLib.gen_words(...args);
 
     if (!err) {
