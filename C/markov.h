@@ -9,7 +9,14 @@
 #include "my_string.h"
 #include "macros.h"
 
+/* to hold all possible values, ALPHABET_LENGTH has to be 256 
+ * However, to save some/a lot of memory, lower values could be experimented
+ * with. */
 #define ALPHABET_LENGTH 256
+
+/* */
+#define INCREASE_SIZE   8
+
 #define MAX_WORD_LENGTH 50
 #define WORD_BUFFER     100
 #define MAX_WORDS_READ  50000
@@ -43,10 +50,8 @@ typedef unsigned char uchar;
 typedef struct trienode {
         unsigned freq;
         unsigned freqChildren;
-        uchar ch;
+        uchar ch, depth, nChildren, maxChildren;
         struct trienode ** children;
-        uchar depth;
-        uchar nChildren;
 } TrieNode;
 
 typedef struct {

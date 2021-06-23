@@ -61,32 +61,50 @@ void freeTrie(TrieNode * root)
     free(node->children);
     free(root);
 }
+void fit_child(TrieNode * parent, TrieNode * child)
+{
+    TrieNode *tmp[ALPHABET_LENGTH];
+    int i;
+    if (parent->nChildren < parent->maxChildren)
+        parent->children[parent->nChildren++] = child;
+    else {
+        for (i = 0; i < parent->nChildren; i++)
+            tmp[i] = parent->children[i];
+        free(parent->children);
+        parent->maxChildren += INCREASE_SIZE;
+        parent->children = calloc(parent->maxChildren, sizeof(TrieNode *));
+        for (i = 0; i < parent->nChildren; i++)
+            parent->children[i] = tmp[i];
+        parent->children[parent->nChildren++] = child;
+    }
+}
 TrieNode * addChild(TrieNode * parent, uchar ch, unsigned freq){
-  TrieNode * child;
-  /* if child is already in parent, update frequency and return */
-  if(parent != NULL && (child = getChild(parent, ch)) != NULL){
-    parent->freqChildren += freq;
-    child->freq += freq;
+    TrieNode *child;;
+    /* if child is already in parent, update frequency and return */
+    if(parent != NULL && (child = getChild(parent, ch)) != NULL){
+        parent->freqChildren += freq;
+        child->freq += freq;
+        return child;
+    }
+
+    /* otherwise, append to parent and return */
+
+    child = malloc(sizeof(TrieNode));
+    child->depth = (parent == NULL ? 0 : parent->depth + 1);
+    child->freq = freq;
+    child->freqChildren = 0;
+
+    child->ch = ch;
+    child->nChildren = 0;
+    child->maxChildren = INCREASE_SIZE;
+    child->children = calloc(child->maxChildren, sizeof(TrieNode *));
+
+    if(parent != NULL){
+        parent->freqChildren += freq;
+        fit_child(parent, child);
+    }
+
     return child;
-  }
-
-  /* otherwise, append to parent and return */
-
-  child = malloc(sizeof(TrieNode));
-  child->depth = (parent == NULL ? 0 : parent->depth + 1);
-  child->freq = freq;
-  child->freqChildren = 0;
-  
-  child->ch = ch;
-  child->nChildren = 0;
-  child->children = calloc(ALPHABET_LENGTH, sizeof(TrieNode *));
-
-  if(parent != NULL){
-    parent->freqChildren += freq;
-    parent->children[parent->nChildren++] = child;
-  }
-
-  return child;
 }
 TrieNode * getChild(TrieNode * node, uchar ch){
   int i;
@@ -234,7 +252,8 @@ TrieNode * readEntry(FILE * fp){
     perror("Now the OS will say something fancy");
     exit(ERR_READ_ENTRY);
   }
-  child->children = calloc(ALPHABET_LENGTH, sizeof(TrieNode *));
+  child->maxChildren = INCREASE_SIZE;
+  child->children = calloc(child->maxChildren, sizeof(TrieNode *));
   /* to define later, as children are read */
   child->nChildren = 0;
   child->freqChildren = 0;
@@ -279,15 +298,18 @@ TrieNode * readTrie(char * path, uchar readuntil){
      *  */
     parent = stackLast(st);
     child = readEntry(fp);
-    if(child->depth > readuntil + 2) // or +3 ?
+    if(child->depth > readuntil + 2) {
+        free(child->children);
+        free(child);
         continue;
+    }
     if(child->depth <= parent->depth){
       while(child->depth <= parent->depth)
         parent = triePop(st);
       triePush(st, parent); 
     }
-    parent->children[parent->nChildren++] = child;
     parent->freqChildren += child->freq;
+    fit_child(parent, child);
     triePush(st, child);
   }
   fclose(fp);
