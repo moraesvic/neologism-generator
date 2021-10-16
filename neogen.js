@@ -2,19 +2,10 @@
 
 const Path = require('path');
 
-const C_SHRLIB = Path.join(__dirname, 'bin/neogen.so');
 const C_BIN    = Path.join(__dirname, 'bin/perf');
 const DATA     = Path.join(__dirname, 'data/');
 
-const ref = require("ref-napi");
-const ffi = require("ffi-napi");
-const TeenPr = require("teen_process");
-
-/* When things go awry... use this */
-/*
-const SegfaultHandler = require('segfault-handler');
-SegfaultHandler.registerHandler("crash.log");
-*/
+const chpr = require("child_process");
 
 const MAX_WORDS_IN_ANSWER = 1000;
 const NON_ASCII_FACTOR    = 1.75;
@@ -112,44 +103,29 @@ const myFunction = async function neogen(nWords, lang, trieDepth, minWordLen){
     
 };
 
-async function neogen_shrlib(ret, filename, trieDepth,
-nWords, minWordLen, timeout)
+function chprPromise(cmd, args)
 {
-    /* This is now deprecated. It would be easier to do everything through ffi,
-     * but unfortunately the thing leaks memory. */
-    const charPtr = ref.refType('char');
-    const cLib = ffi.Library(C_SHRLIB, {gen_words: 
-            ['int', [charPtr, 'int', 'int', 'int', charPtr, 'int']]});
-
-    const filenameBuf = Buffer.alloc(1000);
-    filenameBuf.write(filename, 'ascii')
-
-    let buf = Buffer.alloc(MAX_WORDS_IN_ANSWER * 100);
-    const args = [filenameBuf, trieDepth, nWords, minWordLen, buf, timeout];
-
-    const err = cLib.gen_words(...args);
-
-    if (!err) {
-        ret.body = buf.toString().replace(/\0/g, '');
-        return ret;
-    } else {
-        console.log("Shared library returned error: %d", err);
-        ret.status = err;
-        return ret;    
-    };
+    return new Promise((resolve, reject) => {
+        chpr.exec(cmd, args, function(err, stdout, stderr){
+            if (err)
+                reject(stderr);
+            else
+                resolve(stdout);
+        });
+    });
 }
 
 async function neogen_C(ret, filename, trieDepth,
 nWords, minWordLen, timeout)
 {
-    let out = await TeenPr.exec(`${C_BIN}`,
-    [ filename, trieDepth, nWords, minWordLen, timeout ]);
-    if (out.stderr === '')
-        ret.body = out.stdout;
-    else
-        ret.body = out.stderr;
-    
-    return ret;
+    try {
+        ret.body = await chprPromise(`${C_BIN} ${filename} ${trieDepth} ${nWords} \
+            ${minWordLen} ${timeout}`);
+    } catch(err) {
+        ret.body = err;
+    } finally {
+        return ret;
+    }
 }
 
 module.exports = myFunction;

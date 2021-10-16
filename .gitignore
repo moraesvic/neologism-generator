@@ -111,3 +111,4 @@ py/__pycache__/
 
 # binary files - just make them yourself!
 bin/*
+*.o

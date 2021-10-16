@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 
 const app = express();
-app.use('/static', express.static('public'));
+app.use('/static', express.static(path.join(__dirname, 'public')));
 
 /* in order to read POST material */
 // Parse URL-encoded bodies (as sent by HTML forms)
@@ -11,18 +11,13 @@ app.use(express.urlencoded({ extended: false }));
 // Parse JSON bodies (as sent by API clients)
 app.use(express.json());
 
-const PUBLIC = path.join(__dirname, 'public/');
 const neogen = require('./neogen.js');
 
-app.get('/', function(req, res){
-  res.send('ok');
-});
-
-app.get('/neogen', function(req, res) {
+app.get('/', function(req, res) {
     res.render('neogen.ejs', {});
 });
 
-app.post('/neogen', async function(req,res) {
+app.post('/', async function(req,res) {
     /* nWords, lang, trieDepth, minWordLen */
     const nWords = req.body.nWords;
     const lang = req.body.lang;
