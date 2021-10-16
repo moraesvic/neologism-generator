@@ -116,7 +116,7 @@ document.getElementById('neogenform').onsubmit = async function(e){
     answer.innerHTML = "loading ...";
 
     waiting = true;
-    fetch('/', {
+    fetch('/neogen', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
