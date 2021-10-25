@@ -1,0 +1,7 @@
+-- The process runtime could be better restricted by a utility like ulimit or timeout. Currently, it does this natively (every so many loops, it checks whether time has expired). Doing this within Bash would be more effective, as it places a watchdog (external process).
+-- Finish translating stuff in my_random.c and my_string.c to English
+-- Change all comments referring to "teen_process", we don't use that anymore, now we use child_process
+-- Change all C variables and functions to snake case. Currently it is mixed with camel case
+-- Add documentation on Trie-file binary format
+-- Break markov.c in a number of files (maybe two is enough, one specific for file I/O)
+-- Add support to parallelization ?
