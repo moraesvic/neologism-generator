@@ -1,3 +1,7 @@
+## Note
+
+This project was developed in October 2021 to improve my abilities with C, algorithms and data structures. It works as intended but several improvements could be made, such as: documentation, tests, code organization and performance. Please take it with a grain of salt.
+
 ## What is this?
 
 This is a neologism generator. A [neologism](https://en.wikipedia.org/wiki/Neologism) is a freshly coined word. Although some creativity is involved in the creation of new words, as we properly credit the geniuses of Shakespeare, Joyce and Guimarães Rosa, neologisms follow phonological and morphological patterns which can be replicated by a mechanical process.
@@ -21,3 +25,5 @@ The web-backend is implemented with NodeJS.
 
 Give it a try on my homepage (still not fully integrated with the rest of the website):
 https://vulpi-ideas.com/neogen
+
+(Note: currently offline)
