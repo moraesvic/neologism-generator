@@ -15,15 +15,20 @@ Starting from frequency words from natural languages, obtained from [this blog](
 **English: generate words with a trie-depth of 10**: air-conditioner, understandings, unconvention, indistinguish, misinterpreter
 **Portuguese: generate words with a trie-depth of 5**: profissionado, massassinando, encontratou
 
+### Example in English
+
+![Example in English](/example-en.png)
+
+### Example in German
+
+![Example in German](/example-de.png)
+
+### Example in Portuguese
+
+![Example in Portuguese](/example-pt.png)
+
 ## How was it implemented?
 
 The backend was implemented with C, with my own implementation of the Trie data structure. This makes it quite fast to process frequency lists. Most of the work is actually done trying to find a word which follows the given Markov process, but is not in the original list. Anyway, even in the worst reasonable scenarios, the server usually responds with only 100 MB RAM usage and 4 seconds delay.
 
 The web-backend is implemented with NodeJS.
-
-## Live demonstration
-
-Give it a try on my homepage (still not fully integrated with the rest of the website):
-https://vulpi-ideas.com/neogen
-
-(Note: currently offline)
